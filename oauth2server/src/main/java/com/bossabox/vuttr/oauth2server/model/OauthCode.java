@@ -1,12 +1,12 @@
-package com.bossabox.vuttr.oauth2server.security;
+package com.bossabox.vuttr.oauth2server.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * Código obtido deste tutorial: 
@@ -16,16 +16,20 @@ import javax.persistence.UniqueConstraint;
  *
  */
 @Entity
-@Table(name="authority", uniqueConstraints = @UniqueConstraint(columnNames = {"name"}, name="AUTHORITY_UNIQUE_NAME"))
-public class Authority {
+@Table(name="oauth_code")
+public class OauthCode {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", columnDefinition = "bigint unsigned")
+	@Column(name = "ID")
 	private Integer id;
-
-	@Column(length=20)
-	private String name;
+	
+	@Column(name="code")
+	private String code;
+	
+	@Lob
+	@Column(name="authentication")
+	private byte[] authentication;
 
 	public Integer getId() {
 		return id;
@@ -35,12 +39,21 @@ public class Authority {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getCode() {
+		return code;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setCode(String code) {
+		this.code = code;
 	}
 
+	public byte[] getAuthentication() {
+		return authentication;
+	}
+
+	public void setAuthentication(byte[] authentication) {
+		this.authentication = authentication;
+	}
+	
+	
 }

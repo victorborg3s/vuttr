@@ -1,4 +1,4 @@
-package com.bossabox.vuttr.oauth2server.security;
+package com.bossabox.vuttr.oauth2server.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,19 +16,23 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name="oauth_code")
-public class OauthCode {
+@Table(name="oauth_refresh_token")
+public class OauthRefreshToken {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", columnDefinition = "bigint unsigned")
+	@Column(name = "ID")
 	private Integer id;
 	
-	@Column(name="code")
-	private String code;
+	@Column(name="token_id")
+	private String tokenId;
 	
 	@Lob
-	@Column(name="authentication", columnDefinition = "mediumblob")
+	@Column(name="token")
+	private byte[] token;
+	
+	@Lob
+	@Column(name="authentication")
 	private byte[] authentication;
 
 	public Integer getId() {
@@ -39,12 +43,20 @@ public class OauthCode {
 		this.id = id;
 	}
 
-	public String getCode() {
-		return code;
+	public String getTokenId() {
+		return tokenId;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
+	public void setTokenId(String tokenId) {
+		this.tokenId = tokenId;
+	}
+
+	public byte[] getToken() {
+		return token;
+	}
+
+	public void setToken(byte[] token) {
+		this.token = token;
 	}
 
 	public byte[] getAuthentication() {
@@ -54,6 +66,4 @@ public class OauthCode {
 	public void setAuthentication(byte[] authentication) {
 		this.authentication = authentication;
 	}
-	
-	
 }

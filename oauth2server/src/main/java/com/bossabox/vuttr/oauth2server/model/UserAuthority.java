@@ -1,4 +1,4 @@
-package com.bossabox.vuttr.oauth2server.security;
+package com.bossabox.vuttr.oauth2server.model;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,7 +25,7 @@ public class UserAuthority {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", columnDefinition = "bigint unsigned")
+	@Column(name = "ID")
 	private Integer id;
 	
 	@ManyToOne(cascade = CascadeType.ALL)

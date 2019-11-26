@@ -1,4 +1,4 @@
-package com.bossabox.vuttr.oauth2server.security;
+package com.bossabox.vuttr.oauth2server.model;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,12 +22,12 @@ import javax.persistence.UniqueConstraint;
  *
  */
 @Entity
-@Table(name="user", uniqueConstraints = @UniqueConstraint(columnNames = {"userName"}, name="USER_UNIQUE_USERNAME"))
+@Table(name="principal", uniqueConstraints = @UniqueConstraint(columnNames = {"userName"}, name="USER_UNIQUE_USERNAME"))
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", columnDefinition = "bigint unsigned")
+	@Column(name = "ID")
 	private Integer id;
 
 	@Column(length=50)

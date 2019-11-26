@@ -1,4 +1,4 @@
-package com.bossabox.vuttr.oauth2server.security;
+package com.bossabox.vuttr.oauth2server.model;
 
 import java.util.Date;
 
@@ -23,7 +23,7 @@ public class OauthClientDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", columnDefinition = "bigint unsigned")
+	@Column(name = "ID")
 	private Integer id;
 	
 	@Column(name="client_id")
@@ -59,7 +59,7 @@ public class OauthClientDetails {
 	@Column(name="additional_information", length=4096)
 	private String additionalInformation;
 	
-	@Column(name="autoapprove", columnDefinition = "TINYINT(4)")
+	@Column(name="autoapprove", columnDefinition = "smallint")
 	private Integer autoapprove;
 	
 	@Column(name="uuid")

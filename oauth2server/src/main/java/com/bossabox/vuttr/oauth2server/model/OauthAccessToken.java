@@ -1,4 +1,4 @@
-package com.bossabox.vuttr.oauth2server.security;
+package com.bossabox.vuttr.oauth2server.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,14 +21,14 @@ public class OauthAccessToken {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", columnDefinition = "bigint unsigned")
+	@Column(name = "ID")
 	private Integer id;
 	
 	@Column(name="token_id")
 	private String tokenId;
 	
 	@Lob
-	@Column(name="token", columnDefinition = "mediumblob")
+	@Column(name="token")
 	private byte[] token;
 	
 	@Column(name="authentication_id")
@@ -41,7 +41,7 @@ public class OauthAccessToken {
 	private String clientId;
 	
 	@Lob
-	@Column(name="authentication", columnDefinition = "mediumblob")
+	@Column(name="authentication")
 	private byte[] authentication;
 	
 	@Column(name="refresh_token")
