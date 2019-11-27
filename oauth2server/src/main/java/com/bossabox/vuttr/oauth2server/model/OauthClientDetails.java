@@ -11,72 +11,72 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 /**
- * Código obtido deste tutorial: 
+ * Código obtido deste tutorial:
  * https://medium.com/@supunbhagya/spring-oauth2-authorization-server-jwt-jpa-data-model-1e458dcdac04
  * 
  * @author coderSinol@github.com
  *
  */
 @Entity
-@Table(name="oauth_client_details")
+@Table(name = "oauth_client_details")
 public class OauthClientDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Integer id;
-	
-	@Column(name="client_id")
+
+	@Column(name = "client_id", unique = true)
 	private String clientId;
-	
-	@Column(name="client_name")
+
+	@Column(name = "client_name")
 	private String clientName;
-	
-	@Column(name="resource_ids")
+
+	@Column(name = "resource_ids")
 	private String resourceIds;
-	
-	@Column(name="client_secret")
+
+	@Column(name = "client_secret")
 	private String clientSecret;
-	
-	@Column(name="scope")
+
+	@Column(name = "scope")
 	private String scope;
-	
-	@Column(name="authorized_grant_types")
+
+	@Column(name = "authorized_grant_types")
 	private String authorizedGrantTypes;
-	
-	@Column(name="web_server_redirect_uri")
+
+	@Column(name = "web_server_redirect_uri")
 	private String webServerRedirectUri;
-	
-	@Column(name="authorities")
+
+	@Column(name = "authorities")
 	private String authorities;
-	
-	@Column(name="access_token_validity", length=11)
+
+	@Column(name = "access_token_validity", length = 11)
 	private Integer accessTokenValidity;
-	
-	@Column(name="refresh_token_validity", length=11)
+
+	@Column(name = "refresh_token_validity", length = 11)
 	private Integer refreshTokenValidity;
-	
-	@Column(name="additional_information", length=4096)
+
+	@Column(name = "additional_information", length = 4096)
 	private String additionalInformation;
-	
-	@Column(name="autoapprove", columnDefinition = "smallint")
+
+	@Column(name = "autoapprove", columnDefinition = "smallint")
 	private Integer autoapprove;
-	
-	@Column(name="uuid")
+
+	@Column(name = "uuid")
 	private String uuid;
-	
+
 	@Column
 	private Date created;
-	
-	@Column(columnDefinition ="boolean default true")
+
+	@Column(columnDefinition = "boolean default true")
 	private Boolean enabled;
-	
+
 	@Transient
 	private String[] scopes;
-	
+
 	@Transient
 	private String[] grantTypes;
-	
+
 	@Transient
 	private String ownerEmail;
 
@@ -231,6 +231,5 @@ public class OauthClientDetails {
 	public void setOwnerEmail(String ownerEmail) {
 		this.ownerEmail = ownerEmail;
 	}
-	
-	
+
 }

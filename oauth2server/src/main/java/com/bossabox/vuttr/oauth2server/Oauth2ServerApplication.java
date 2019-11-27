@@ -8,7 +8,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-@ComponentScan({ "com.bossabox.vuttr.oauth2server.model","com.bossabox.vuttr.oauth2server.persistence" })
+@ComponentScan({ "com.bossabox.vuttr.oauth2server.model", "com.bossabox.vuttr.oauth2server.persistence",
+		"com.bossabox.vuttr.oauth2server.config", "com.bossabox.vuttr.oauth2server.service" })
 @EnableJpaRepositories(basePackages = "com.bossabox.vuttr.oauth2server.persistence")
 public class Oauth2ServerApplication {
 
@@ -17,12 +18,12 @@ public class Oauth2ServerApplication {
 	}
 
 	public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/oauth/token").allowedOrigins("*");
-            }
-        };
-    }
-	
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/oauth/token").allowedOrigins("*");
+			}
+		};
+	}
+
 }
