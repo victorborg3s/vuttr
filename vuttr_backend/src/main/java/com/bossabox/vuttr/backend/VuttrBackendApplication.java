@@ -2,37 +2,17 @@ package com.bossabox.vuttr.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
+@ComponentScan({ "com.bossabox.vuttr.backend.config", "com.bossabox.vuttr.backend.controller",
+		"com.bossabox.vuttr.backend.model", "com.bossabox.vuttr.backend.persistence" })
+@EnableJpaRepositories(basePackages = "com.bossabox.vuttr.backend.persistence")
 public class VuttrBackendApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(VuttrBackendApplication.class, args);
 	}
 
-	@RestController
-	private static class SampleController {
-
-		@PostMapping("/")
-		public SampleHello index(String param) {
-			return new SampleHello();
-		}
-
-		private static class SampleHello {
-			String hello = "World";
-
-			public String getHello() {
-				return hello;
-			}
-
-			public void setHello(String value) {
-				this.hello = value;
-			}
-			
-		}
-		
-	}
-	
 }
