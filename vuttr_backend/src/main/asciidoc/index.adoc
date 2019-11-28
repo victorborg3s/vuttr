@@ -119,8 +119,23 @@ Pagination response has following structure:
 [[resources]]
 = Resources
 
-include::{snippets}/index/curl-request.adoc[]
-include::{snippets}/index/request-body.adoc[]
-include::{snippets}/index/request-fields.adoc[]
-include::{snippets}/index/response-body.adoc[]
-include::{snippets}/index/response-fields.adoc[]
+[[resources-tool]]
+== Tool API
+
+[[resources-tool-get-tools-with-no-parameter]]
+=== List All Tools
+
+[[resources-tool-get-tools-with-no-parameter-curl-request]]
+==== Sample curl Request
+
+include::{snippets}/tools-api/get-tools-with-no-parameter/curl-request.adoc[]
+
+[[resources-tool-get-tools-with-no-parameter-http-response]]
+==== Sample HTTP Response
+
+include::{snippets}/tools-api/get-tools-with-no-parameter/http-response.adoc[]
+
+[[resources-tool-get-tools-with-no-parameter-response-fields]]
+==== Response Fields
+
+include::{snippets}/tools-api/get-tools-with-no-parameter/response-fields.adoc[]
