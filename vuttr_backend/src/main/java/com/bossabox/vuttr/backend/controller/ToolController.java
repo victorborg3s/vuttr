@@ -54,7 +54,7 @@ public class ToolController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	@PreAuthorize("#oauth2.hasAnyScope('read')")
-	public @ResponseBody Tool save(OAuth2Authentication auth, @Valid @RequestBody Tool tool) {
+	public @ResponseBody Tool save(@Valid @RequestBody Tool tool) {
 		return toolDao.save(tool);
 	}
 
@@ -63,7 +63,7 @@ public class ToolController {
 	 * accessible with a valid {@link OAuth2Authentication}
 	 * 
 	 * @param auth token with user authentication that can be used to do some checking
-	 * @param tool the object to be inserted/updated
+	 * @param toolDescriptor the object to be inserted/updated
 	 * @return inserted/updated record
 	 */
 	@DeleteMapping
