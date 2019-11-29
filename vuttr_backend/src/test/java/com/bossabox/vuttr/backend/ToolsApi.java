@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,27 +27,29 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.bossabox.vuttr.backend.controller.ToolController;
 import com.bossabox.vuttr.backend.model.Tool;
+import com.bossabox.vuttr.backend.persistence.ToolDao;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
 @ExtendWith({ RestDocumentationExtension.class, SpringExtension.class })
-//@AutoConfigureMockMvc
+@WebAppConfiguration
 class ToolsApi {
-
-	private MockMvc mockMvc;
 
 	@Autowired
 	private WebApplicationContext context;
 
 	@MockBean
-	private ToolController toolControllerMock;
-
+	private ToolDao toolDaoMock;
+	
+    private MockMvc mockMvc;
 	private Tool toolSubject;
 	private List<Tool> toolsSubjects;
 
@@ -71,7 +73,7 @@ class ToolsApi {
 		toolsSubjects.add(toolSubject);
 
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(documentationConfiguration(restDocumentation))
-				.build();
+				.apply(springSecurity()).build();
 	}
 
 	FieldDescriptor[] toolDescriptor = new FieldDescriptor[] {
@@ -82,32 +84,43 @@ class ToolsApi {
 			fieldWithPath("tags[]").type(JsonFieldType.ARRAY).description("Tags that categorize the tool") };
 
 	@Test
-	public void getToolsWithNoParameter() throws Exception {
-		when(toolControllerMock.getAll(null)).thenReturn(toolsSubjects);
+	public void WhenGetToolsWithoutParameterShouldReturnToolList() throws Exception {
+		when(toolDaoMock.findAll()).thenReturn(toolsSubjects);
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonSubjects = mapper.writeValueAsString(toolsSubjects);
 
 		this.mockMvc.perform(get("/tools").accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
-				.andExpect(content().json("[{id: 1,title: \"Notion\",link: \"https://notion.so\","
-						+ "        description: \"All in one tool to organize teams and ideas. Write, plan, collaborate, and get organized. \",\n"
-						+ "        tags: [\"organization\",\"planning\",\"collaboration\",\"writing\",\"calendar\"]"
-						+ "}]"))
+				.andExpect(content().json(jsonSubjects))
 				.andDo(document("{class-name}/{method-name}",
 						responseFields(fieldWithPath("[]").type(JsonFieldType.ARRAY).description("An array of tools"))
 								.andWithPrefix("[].", toolDescriptor)));
 	}
 
 	@Test
-	public void createOrUpdateTool() throws Exception {
-		when(toolControllerMock.save(toolSubject)).thenReturn(toolSubject);
+	public void WhenCreateOrUpdateToolWhithoutCredentialsShouldDenyAccess() throws Exception {
+		when(toolDaoMock.save(toolSubject)).thenReturn(toolSubject);
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonSubject = mapper.writeValueAsString(toolSubject);
 
-		this.mockMvc.perform(post("/tools").content("{\"id\": 1,\"title\": \"Notion\",\"link\": \"https://notion.so\","
-				+ "\"description\": \"All in one tool to organize teams and ideas. Write, plan, collaborate, and get organized. \",\n"
-				+ "\"tags\": [\"organization\",\"planning\",\"collaboration\",\"writing\",\"calendar\"]}")
-				.contentType(MediaType.APPLICATION_JSON).characterEncoding("UTF-8"))
-				.andDo(print()).andExpect(status().isCreated())
-				.andExpect(content().json("{\"id\": 1,\"title\": \"Notion\",\"link\": \"https://notion.so\",\"description\": \"All in one tool to organize teams and ideas. Write, plan, collaborate, and get organized. \", \"tags\": [\"organization\",\"planning\",\"collaboration\",\"writing\",\"calendar\"]}"))
-				.andDo(document("{class-name}/{method-name}",
-						requestFields(toolDescriptor),
-						responseFields(toolDescriptor)));
+		this.mockMvc
+				.perform(post("/tools").content(jsonSubject).contentType(MediaType.APPLICATION_JSON)
+						.characterEncoding("UTF-8"))
+				.andDo(print()).andExpect(status().isForbidden())
+				.andExpect(content().json("{'error': 'Access denied.'}")).andDo(document("{class-name}/{method-name}"));
+	}
+
+	@Test
+	@WithMockUser(username ="admin", authorities = {"ADMIN"}, roles = {"USER"})
+	public void WhenCreateOrUpdateToolWhithCredentialsShouldDenyAccess() throws Exception {
+		when(toolDaoMock.save(toolSubject)).thenReturn(toolSubject);
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonSubject = mapper.writeValueAsString(toolSubject);
+
+		this.mockMvc
+				.perform(post("/tools").content(jsonSubject).contentType(MediaType.APPLICATION_JSON)
+						.characterEncoding("UTF-8"))
+				.andDo(print()).andExpect(status().isForbidden())
+				.andExpect(content().json("{'error': 'Access denied.'}")).andDo(document("{class-name}/{method-name}"));
 	}
 
 }
