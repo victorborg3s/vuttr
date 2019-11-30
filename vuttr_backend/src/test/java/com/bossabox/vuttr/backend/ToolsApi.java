@@ -14,7 +14,6 @@ import java.util.List;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,18 +26,20 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.bossabox.vuttr.backend.model.Tool;
-import com.bossabox.vuttr.backend.persistence.ToolDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringBootTest
+import com.bossabox.vuttr.backend.model.Tool;
+import com.bossabox.vuttr.backend.persistence.ToolDao;
+
+@SpringBootTest(classes = { VuttrBackendApplication.class })
+@ActiveProfiles("test")
 @ExtendWith({ RestDocumentationExtension.class, SpringExtension.class })
 @WebAppConfiguration
 class ToolsApi {
@@ -48,8 +49,8 @@ class ToolsApi {
 
 	@MockBean
 	private ToolDao toolDaoMock;
-	
-    private MockMvc mockMvc;
+
+	private MockMvc mockMvc;
 	private Tool toolSubject;
 	private List<Tool> toolsSubjects;
 
@@ -73,7 +74,7 @@ class ToolsApi {
 		toolsSubjects.add(toolSubject);
 
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(documentationConfiguration(restDocumentation))
-				.apply(springSecurity()).build();
+				.build();
 	}
 
 	FieldDescriptor[] toolDescriptor = new FieldDescriptor[] {
@@ -97,7 +98,7 @@ class ToolsApi {
 	}
 
 	@Test
-	public void WhenCreateOrUpdateToolWhithoutCredentialsShouldDenyAccess() throws Exception {
+	public void WhenCreateOrUpdateToolWhithoutCredentialsShouldUnauthorize() throws Exception {
 		when(toolDaoMock.save(toolSubject)).thenReturn(toolSubject);
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonSubject = mapper.writeValueAsString(toolSubject);
@@ -110,17 +111,16 @@ class ToolsApi {
 	}
 
 	@Test
-	@WithMockUser(username ="admin", authorities = {"ADMIN"}, roles = {"USER"})
-	public void WhenCreateOrUpdateToolWhithCredentialsShouldDenyAccess() throws Exception {
+	public void WhenCreateOrUpdateToolWhithCredentialsShouldReturnTool() throws Exception {
 		when(toolDaoMock.save(toolSubject)).thenReturn(toolSubject);
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonSubject = mapper.writeValueAsString(toolSubject);
 
 		this.mockMvc
-				.perform(post("/tools").content(jsonSubject).contentType(MediaType.APPLICATION_JSON)
-						.characterEncoding("UTF-8"))
-				.andDo(print()).andExpect(status().isForbidden())
-				.andExpect(content().json("{'error': 'Access denied.'}")).andDo(document("{class-name}/{method-name}"));
+				.perform(post("/tools").header("Authorization", "Bearer my-fake-token").content(jsonSubject)
+						.contentType(MediaType.APPLICATION_JSON).characterEncoding("UTF-8"))
+				.andDo(print()).andExpect(status().isCreated()).andExpect(content().json("{'error': 'Access denied.'}"))
+				.andDo(document("{class-name}/{method-name}"));
 	}
 
 }
