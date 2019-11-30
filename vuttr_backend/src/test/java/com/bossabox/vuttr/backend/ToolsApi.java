@@ -1,8 +1,8 @@
 package com.bossabox.vuttr.backend;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -14,48 +14,53 @@ import java.util.List;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.bossabox.vuttr.backend.controller.ToolController;
 import com.bossabox.vuttr.backend.model.Tool;
 import com.bossabox.vuttr.backend.persistence.ToolDao;
 
-@SpringBootTest(classes = { VuttrBackendApplication.class })
-@ActiveProfiles("test")
-@ExtendWith({ RestDocumentationExtension.class, SpringExtension.class })
-@WebAppConfiguration
+@RunWith(SpringRunner.class)
+@Import(TestConfig.class)
+@WebMvcTest(ToolController.class)
+@AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 class ToolsApi {
-
-	@Autowired
-	private WebApplicationContext context;
 
 	@MockBean
 	private ToolDao toolDaoMock;
 
+	@MockBean
+	private ResourceServerTokenServices tokenServiceMock;
+	
+	@Autowired
 	private MockMvc mockMvc;
+
+	@Autowired
+	private OAuth2Authentication auth;
+	
 	private Tool toolSubject;
 	private List<Tool> toolsSubjects;
-
+	
 	@BeforeEach
-	public void setUp(RestDocumentationContextProvider restDocumentation) {
+	public void setUp() {
 		this.toolSubject = new Tool();
 		toolSubject.setId(1);
 		toolSubject.setTitle("Notion");
@@ -71,10 +76,7 @@ class ToolsApi {
 		toolSubject.setTags(tags);
 
 		toolsSubjects = new ArrayList<Tool>();
-		toolsSubjects.add(toolSubject);
-
-		this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(documentationConfiguration(restDocumentation))
-				.build();
+		toolsSubjects.add(toolSubject);		
 	}
 
 	FieldDescriptor[] toolDescriptor = new FieldDescriptor[] {
@@ -106,21 +108,26 @@ class ToolsApi {
 		this.mockMvc
 				.perform(post("/tools").content(jsonSubject).contentType(MediaType.APPLICATION_JSON)
 						.characterEncoding("UTF-8"))
-				.andDo(print()).andExpect(status().isForbidden())
-				.andExpect(content().json("{'error': 'Access denied.'}")).andDo(document("{class-name}/{method-name}"));
+				.andDo(print()).andExpect(status().isUnauthorized())
+				.andExpect(content().json("{'error': 'unauthorized'}")).andDo(document("{class-name}/{method-name}"));
 	}
 
 	@Test
-	public void WhenCreateOrUpdateToolWhithCredentialsShouldReturnTool() throws Exception {
-		when(toolDaoMock.save(toolSubject)).thenReturn(toolSubject);
+	public void WhenCreateOrUpdateToolWhithValidCredentialsShouldReturnTool() throws Exception {
+		when(toolDaoMock.save(any(Tool.class))).thenReturn(toolSubject);
+		when(tokenServiceMock.loadAuthentication(any(String.class))).thenReturn(auth);
+		
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonSubject = mapper.writeValueAsString(toolSubject);
 
 		this.mockMvc
-				.perform(post("/tools").header("Authorization", "Bearer my-fake-token").content(jsonSubject)
+				.perform(post("/tools").header("Authorization", "Bearer a-valid-oauth2-authentication-token").content(jsonSubject)
 						.contentType(MediaType.APPLICATION_JSON).characterEncoding("UTF-8"))
-				.andDo(print()).andExpect(status().isCreated()).andExpect(content().json("{'error': 'Access denied.'}"))
-				.andDo(document("{class-name}/{method-name}"));
+				.andDo(print()).andExpect(status().isCreated())
+				.andExpect(content().json(jsonSubject))
+				.andDo(document("{class-name}/{method-name}",
+						requestFields(toolDescriptor),
+						responseFields(toolDescriptor)));
 	}
 
 }

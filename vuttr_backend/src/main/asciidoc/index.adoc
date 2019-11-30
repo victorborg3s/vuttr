@@ -128,14 +128,22 @@ Pagination response has following structure:
 [[resources-tool-get-tools-with-no-parameter-curl-request]]
 ==== Sample curl Request
 
-include::{snippets}/tools-api/get-tools-with-no-parameter/curl-request.adoc[]
+include::{snippets}/tools-api/when-get-tools-without-parameter-should-return-tool-list/curl-request.adoc[]
 
 [[resources-tool-get-tools-with-no-parameter-http-response]]
 ==== Sample HTTP Response
 
-include::{snippets}/tools-api/get-tools-with-no-parameter/http-response.adoc[]
+include::{snippets}/tools-api/when-get-tools-without-parameter-should-return-tool-list/http-response.adoc[]
 
 [[resources-tool-get-tools-with-no-parameter-response-fields]]
 ==== Response Fields
 
-include::{snippets}/tools-api/get-tools-with-no-parameter/response-fields.adoc[]
+include::{snippets}/tools-api/when-get-tools-without-parameter-should-return-tool-list/response-fields.adoc[]
+
+[[resources-tool-post-tool]]
+=== Create or Update a Tool
+
+[[resources-tool-post-tool-curl-request]]
+==== Sample curl Request With Valid Authentication
+
+include::{snippets}/tools-api/when-create-or-update-tool-whith-valid-credentials-should-return-tool/curl-request.adoc[]
