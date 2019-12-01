@@ -51,3 +51,11 @@ Enter the `../vuttr/vuttr_backend` directory and run:
 Where `{version}` is the application version, pointed by `<version>` tag in the pom.xml project file.
 
 Tip: use `jobs`, `fg`, `bg` and `kill %<job number>` to control background jobs.
+
+### Conclusion
+
+After running these commands, you can do requests to application's end-point. Check the [API Documentation](http://htmlpreview.github.io/?https://github.com/victorborg3s/vuttr/blob/master/vuttr_backend/target/generated-docs/index.html) for some clues.
+
+## TODOs
+
+- All the front-end.
