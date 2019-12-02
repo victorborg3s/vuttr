@@ -13,7 +13,7 @@ import com.bossabox.vuttr.oauth2server.config.ServerWebSecurityConfig;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { Oauth2ServerApplication.class, OAuth2AuthorizationServerConfig.class,
 		ServerWebSecurityConfig.class })
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 class Oauth2serverApplicationTests {
 
 	@Test

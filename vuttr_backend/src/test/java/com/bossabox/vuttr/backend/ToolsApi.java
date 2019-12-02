@@ -30,6 +30,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +42,7 @@ import com.bossabox.vuttr.backend.persistence.ToolDao;
 @RunWith(SpringRunner.class)
 @Import(TestConfig.class)
 @WebMvcTest(ToolController.class)
+@ActiveProfiles("test")
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 class ToolsApi {
 

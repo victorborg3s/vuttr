@@ -21,8 +21,8 @@ insert into oauth_client_details(
 	10800,
 	2592000,
 	null,
-	null) ON CONFLICT DO NOTHING;
-insert into authority(name) values ('ADMIN') ON CONFLICT DO NOTHING;
+	null);
+insert into authority(name) values ('ADMIN');
 insert into principal(
 	account_expired,
 	account_locked,
@@ -36,5 +36,5 @@ insert into principal(
 	false,
 	true,
 	'$2a$08$qvrzQZ7jJ7oy2p/msL4M0.l83Cd0jNsX6AJUitbgRXGzge4j035ha',
-	'admin') ON CONFLICT DO NOTHING;
-insert into user_authority(authority_id,user_id) values (1,1) ON CONFLICT DO NOTHING;
+	'admin');
+insert into user_authority(authority_id,user_id) values (1,1);
