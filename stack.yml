@@ -9,10 +9,10 @@ services:
     depends_on:
       - resource_db
     ports:
-      - 8095:8095
+      - 3000:3000
 
   oauth2:
-    image: vuttr/oauth2server
+    image: vuttr/oauth2
     build: .
     depends_on:
       - oauth2_db
@@ -24,16 +24,12 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres
-    ports:
-      - 5432:5432
 
   oauth2_db:
     image: postgres
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres
-    ports:
-      - 5432:5432
 
   adminer:
     image: adminer
