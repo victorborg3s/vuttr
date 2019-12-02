@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "vuttr.oauth2.host",
+  "type": "java.lang.String",
+  "description": "Ip or name for oauth2 server"
+}]}
