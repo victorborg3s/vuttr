@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -58,35 +57,22 @@ class ToolsApi {
 	@Autowired
 	private OAuth2Authentication auth;
 	
+	@Autowired
 	private Tool toolSubject;
+	
+	@Autowired
 	private List<Tool> toolsSubjects;
 	
-	@BeforeEach
-	public void setUp() {
-		this.toolSubject = new Tool();
-		toolSubject.setId(1);
-		toolSubject.setTitle("Notion");
-		toolSubject.setLink("https://notion.so");
-		toolSubject.setDescription(
-				"All in one tool to organize teams and ideas. Write, plan, collaborate, and get organized. ");
-		List<String> tags = new ArrayList<String>();
-		tags.add("organization");
-		tags.add("planning");
-		tags.add("collaboration");
-		tags.add("writing");
-		tags.add("calendar");
-		toolSubject.setTags(tags);
-
-		toolsSubjects = new ArrayList<Tool>();
-		toolsSubjects.add(toolSubject);		
-	}
-
-	FieldDescriptor[] toolDescriptor = new FieldDescriptor[] {
+	private FieldDescriptor[] toolDescriptor = new FieldDescriptor[] {
 			fieldWithPath("id").type(JsonFieldType.NUMBER).description("Unique number that itentifies the tool"),
 			fieldWithPath("title").type(JsonFieldType.STRING).description("Tool's title"),
 			fieldWithPath("link").type(JsonFieldType.STRING).description("Website where to find tool's reference"),
 			fieldWithPath("description").type(JsonFieldType.STRING).description("Tool's description"),
 			fieldWithPath("tags[]").type(JsonFieldType.ARRAY).description("Tags that categorize the tool") };
+
+	@BeforeEach
+	public void setUp() {
+	}
 
 	@Test
 	public void WhenGetToolsWithoutParameterShouldReturnToolList() throws Exception {
