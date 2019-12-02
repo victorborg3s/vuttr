@@ -27,30 +27,26 @@ Preflight requirement:
 ~$ git clone https://github.com/victorborg3s/vuttr.git
 ```
 
-### Step 2. Deploy Database Stack
-From downloaded project directory:
+### Step 2. Build Jars
 
+From `../vuttr/oauth2server` directory:
 ```console
-~/vuttr$ docker stack deploy -c stack.yml postgres
+~/vuttr/oauth2server$ mvn clean install
+~/vuttr/oauth2server$ docker build -t vuttr/oauth2 .
 ```
 
-### Step 3. Build and Run the OAuth2Server
-Enter the `../vuttr/oauth2server` directory and run:
+And from `../vuttr/vuttr_backend` directory:
 ```console
-~/vuttr/oauth2server$ mvn install
-~/vuttr/oauth2server$ java -jar target/oauth2server-{version}.jar &>/dev/null &
+~/vuttr/vuttr_backend$ mvn clean install
+~/vuttr/vuttr_backend$ docker build -t vuttr/resource .
 ```
-Where `{version}` is the application version, pointed by `<version>` tag in the pom.xml project file.
 
-### Step 4. Build and Run the Resource Server
-Enter the `../vuttr/vuttr_backend` directory and run:
+### Step 3. Run Stack
+
+From `../vuttr` directory:
 ```console
-~/vuttr/oauth2server$ mvn install
-~/vuttr/oauth2server$ java -jar target/backend-{version}.jar &>/dev/null &
+~/vuttr$ sudo docker stack deploy -c stack.yml vuttr
 ```
-Where `{version}` is the application version, pointed by `<version>` tag in the pom.xml project file.
-
-Tip: use `jobs`, `fg`, `bg` and `kill %<job number>` to control background jobs.
 
 ### Conclusion
 
