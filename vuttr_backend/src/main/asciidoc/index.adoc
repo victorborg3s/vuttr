@@ -117,28 +117,38 @@ Pagination response has following structure:
 |===
 
 [[resources]]
-= Resources
+= Resources End-points
 
 [[resources-tool]]
 == Tool API
 
 [[resources-tool-get-tools-with-no-parameter]]
-=== List All Tools
+=== List Tools
 
 [[resources-tool-get-tools-with-no-parameter-curl-request]]
-==== Sample curl Request
+==== Sample curl Request Without Parameters
 
 include::{snippets}/tools-api/when-get-tools-without-parameter-should-return-tool-list/curl-request.adoc[]
 
 [[resources-tool-get-tools-with-no-parameter-http-response]]
-==== Sample HTTP Response
+===== Sample HTTP Response
 
 include::{snippets}/tools-api/when-get-tools-without-parameter-should-return-tool-list/http-response.adoc[]
 
 [[resources-tool-get-tools-with-no-parameter-response-fields]]
-==== Response Fields
+===== Response Fields
 
 include::{snippets}/tools-api/when-get-tools-without-parameter-should-return-tool-list/response-fields.adoc[]
+
+[[resources-tool-get-tools-with-parameter-curl-request]]
+====  Sample curl Request With "tag" Parameter
+
+include::{snippets}/tools-api/when-get-tools-with-parameter-should-return-tool-list-with-tag/curl-request.adoc[]
+
+[[resources-tool-get-tools-with-parameter-http-response]]
+===== Sample HTTP Response With Tool List Filtered By Tag
+
+include::{snippets}/tools-api/when-get-tools-with-parameter-should-return-tool-list-with-tag/http-response.adoc[]
 
 [[resources-tool-post-tool]]
 === Create or Update a Tool
@@ -146,4 +156,28 @@ include::{snippets}/tools-api/when-get-tools-without-parameter-should-return-too
 [[resources-tool-post-tool-curl-request]]
 ==== Sample curl Request With Valid Authentication
 
-include::{snippets}/tools-api/when-create-or-update-tool-whith-valid-credentials-should-return-tool/curl-request.adoc[]
+include::{snippets}/tools-api/when-create-or-update-tool-with-valid-credential-should-return-tool/curl-request.adoc[]
+
+[[resources-tool-post-tool-http-response]]
+===== Sample HTTP Response
+
+include::{snippets}/tools-api/when-create-or-update-tool-with-valid-credential-should-return-tool/http-response.adoc[]
+
+[[resources-tool-post-tool-response-fields]]
+===== Response Fields
+
+include::{snippets}/tools-api/when-create-or-update-tool-with-valid-credential-should-return-tool/response-fields.adoc[]
+
+[[resources-tool-delete-tool]]
+=== Delete a Tool
+
+[[resources-tool-delete-tool-curl-request]]
+==== Sample curl Request With Valid Authentication
+
+include::{snippets}/tools-api/when-delete-tool-with-valid-credential-should-return-not-content/curl-request.adoc[]
+
+[[resources-tool-delete-tool-http-response]]
+===== Sample HTTP Response
+
+include::{snippets}/tools-api/when-delete-tool-with-valid-credential-should-return-not-content/http-response.adoc[]
+

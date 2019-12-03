@@ -1,0 +1,18 @@
+#Use this "stack" when developing (it's only the database and adminer)
+version: '3.7'
+
+services:
+
+  database:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    ports:
+      - 8081:8080
+

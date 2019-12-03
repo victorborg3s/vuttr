@@ -1,19 +1,25 @@
 package com.bossabox.vuttr.backend;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +48,7 @@ import com.bossabox.vuttr.backend.persistence.ToolDao;
 @Import(TestConfig.class)
 @WebMvcTest(ToolController.class)
 @ActiveProfiles("test")
-@AutoConfigureRestDocs(outputDir = "target/generated-snippets")
+@AutoConfigureRestDocs(outputDir = "target/generated-snippets", uriPort = 3000)
 class ToolsApi {
 
 	@MockBean
@@ -50,19 +56,16 @@ class ToolsApi {
 
 	@MockBean
 	private ResourceServerTokenServices tokenServiceMock;
-	
+
 	@Autowired
 	private MockMvc mockMvc;
 
 	@Autowired
 	private OAuth2Authentication auth;
-	
-	@Autowired
-	private Tool toolSubject;
-	
+
 	@Autowired
 	private List<Tool> toolsSubjects;
-	
+
 	private FieldDescriptor[] toolDescriptor = new FieldDescriptor[] {
 			fieldWithPath("id").type(JsonFieldType.NUMBER).description("Unique number that itentifies the tool"),
 			fieldWithPath("title").type(JsonFieldType.STRING).description("Tool's title"),
@@ -80,7 +83,7 @@ class ToolsApi {
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonSubjects = mapper.writeValueAsString(toolsSubjects);
 
-		this.mockMvc.perform(get("/tools").accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
+		this.mockMvc.perform(get("/tools").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(content().json(jsonSubjects))
 				.andDo(document("{class-name}/{method-name}",
 						responseFields(fieldWithPath("[]").type(JsonFieldType.ARRAY).description("An array of tools"))
@@ -88,7 +91,24 @@ class ToolsApi {
 	}
 
 	@Test
-	public void WhenCreateOrUpdateToolWhithoutCredentialsShouldUnauthorize() throws Exception {
+	public void WhenGetToolsWithParameterShouldReturnToolListWithTag() throws Exception {
+		String tag = "node";
+		List<Tool> filteredList = toolsSubjects.stream().filter(tool -> tool.getTags().contains(tag))
+				.collect(Collectors.toList());
+		when(toolDaoMock.findByTag(tag)).thenReturn(filteredList);
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonSubjects = mapper.writeValueAsString(filteredList);
+
+		this.mockMvc.perform(get(String.format("/tools?tag=%s", tag)).accept(MediaType.APPLICATION_JSON)).andDo(print())
+				.andExpect(status().isOk()).andExpect(content().json(jsonSubjects))
+				.andDo(document("{class-name}/{method-name}",
+						responseFields(fieldWithPath("[]").type(JsonFieldType.ARRAY).description("An array of tools"))
+								.andWithPrefix("[].", toolDescriptor)));
+	}
+
+	@Test
+	public void WhenCreateOrUpdateToolWhithoutCredentialShouldReturnUnauthorized() throws Exception {
+		Tool toolSubject = toolsSubjects.get(0);
 		when(toolDaoMock.save(toolSubject)).thenReturn(toolSubject);
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonSubject = mapper.writeValueAsString(toolSubject);
@@ -96,26 +116,71 @@ class ToolsApi {
 		this.mockMvc
 				.perform(post("/tools").content(jsonSubject).contentType(MediaType.APPLICATION_JSON)
 						.characterEncoding("UTF-8"))
-				.andDo(print()).andExpect(status().isUnauthorized())
-				.andExpect(content().json("{'error': 'unauthorized'}")).andDo(document("{class-name}/{method-name}"));
+				.andExpect(status().isUnauthorized()).andExpect(content().json("{'error': 'unauthorized'}"))
+				.andDo(document("{class-name}/{method-name}"));
 	}
 
 	@Test
-	public void WhenCreateOrUpdateToolWhithValidCredentialsShouldReturnTool() throws Exception {
+	public void WhenCreateOrUpdateToolWithValidCredentialShouldReturnTool() throws Exception {
+		Tool toolSubject = toolsSubjects.get(0);
 		when(toolDaoMock.save(any(Tool.class))).thenReturn(toolSubject);
 		when(tokenServiceMock.loadAuthentication(any(String.class))).thenReturn(auth);
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonSubject = mapper.writeValueAsString(toolSubject);
 
 		this.mockMvc
-				.perform(post("/tools").header("Authorization", "Bearer a-valid-oauth2-authentication-token").content(jsonSubject)
-						.contentType(MediaType.APPLICATION_JSON).characterEncoding("UTF-8"))
-				.andDo(print()).andExpect(status().isCreated())
-				.andExpect(content().json(jsonSubject))
-				.andDo(document("{class-name}/{method-name}",
-						requestFields(toolDescriptor),
-						responseFields(toolDescriptor)));
+				.perform(post("/tools").header("Authorization", "Bearer a-valid-oauth2-authentication-token")
+						.content(jsonSubject).contentType(MediaType.APPLICATION_JSON).characterEncoding("UTF-8"))
+				.andExpect(status().isCreated()).andExpect(content().json(jsonSubject)).andDo(document(
+						"{class-name}/{method-name}", requestFields(toolDescriptor), responseFields(toolDescriptor)));
+	}
+
+	@Test
+	public void WhenDeleteToolWhithoutCredentialShouldReturnUnauthorized() throws Exception {
+		Tool toolSubject = toolsSubjects.get(0);
+		when(toolDaoMock.getOne(toolSubject.getId())).thenReturn(toolSubject);
+
+		this.mockMvc.perform(delete(String.format("/tools/%d", toolSubject.getId())))
+				.andExpect(status().isUnauthorized()).andExpect(content().json("{'error': 'unauthorized'}"))
+				.andDo(document("{class-name}/{method-name}"));
+	}
+
+	@Test
+	public void WhenDeleteToolWithValidCredentialShouldReturnNotContent() throws Exception {
+		Tool toolSubject = toolsSubjects.get(0);
+		when(toolDaoMock.getOne(toolSubject.getId())).thenReturn(toolSubject);
+		when(tokenServiceMock.loadAuthentication(any(String.class))).thenReturn(auth);
+
+		this.mockMvc
+				.perform(delete("/tools/{id}", toolSubject.getId()).header("Authorization",
+						"Bearer a-valid-oauth2-authentication-token"))
+				.andExpect(status().isNoContent()).andDo(document("{class-name}/{method-name}",
+						pathParameters(parameterWithName("id").description("Tools' id to remove."))));
+	}
+
+	@Test
+	public void WhenDeleteToolWithValidCredentialAndNoParameterShouldReturnMethodNotAllowed() throws Exception {
+		Tool toolSubject = toolsSubjects.get(0);
+		when(toolDaoMock.getOne(toolSubject.getId())).thenReturn(toolSubject);
+		when(tokenServiceMock.loadAuthentication(any(String.class))).thenReturn(auth);
+
+		this.mockMvc.perform(delete("/tools").header("Authorization", "Bearer a-valid-oauth2-authentication-token"))
+				.andExpect(status().isMethodNotAllowed());
+	}
+
+	@Test
+	public void WhenDeleteToolWithValidCredentialAndInvalidParameterShouldReturnMethodNotAllowed() throws Exception {
+		Tool toolSubject = toolsSubjects.get(0);
+		when(toolDaoMock.getOne(toolSubject.getId())).thenReturn(toolSubject);
+		when(tokenServiceMock.loadAuthentication(any(String.class))).thenReturn(auth);
+
+		this.mockMvc
+				.perform(delete("/tools/{id}", "-1").header("Authorization",
+						"Bearer a-valid-oauth2-authentication-token"))
+				.andExpect(status().isBadRequest())
+				.andExpect(content().json("{'error': 'Absent or invalid request parameter.'}"))
+				.andDo(document("{class-name}/{method-name}"));
 	}
 
 }
