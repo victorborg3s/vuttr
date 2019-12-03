@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.bossabox.vuttr</groupId>
 	<artifactId>backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0-rc1</version>
 	<name>vuttr_backend</name>
 	<description>Very Useful Tools to Remember</description>
 
