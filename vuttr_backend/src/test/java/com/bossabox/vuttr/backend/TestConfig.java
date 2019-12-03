@@ -25,7 +25,6 @@ import com.bossabox.vuttr.backend.model.Tool;
 public class TestConfig {
  
 	private OAuth2Authentication authentication = null;
-	private Tool tool = null;
 	private List<Tool> tools = null;
 	
     @Bean
@@ -67,9 +66,10 @@ public class TestConfig {
     List<Tool> toolsTestSubject() {
     	if (tools == null) {
     		tools = new ArrayList<Tool>();
+
+    		Tool tool = new Tool();
     		List<String> tags = new ArrayList<String>();
-    		
-    		tool = new Tool();
+
     		tool.setId(1);
     		tool.setTitle("Notion");
     		tool.setLink("https://notion.so");
@@ -83,7 +83,8 @@ public class TestConfig {
     		tool.setTags(tags);
     		tools.add(tool);
 
-    		Tool tool = new Tool();
+    		tool = new Tool();
+    		tags = new ArrayList<String>();
     		tool.setId(2);
     		tool.setTitle("json-server");
     		tool.setLink("https://github.com/typicode/json-server");
