@@ -25,7 +25,6 @@ import com.bossabox.vuttr.backend.model.Tool;
 public class TestConfig {
  
 	private OAuth2Authentication authentication = null;
-	private Tool tool = null;
 	private List<Tool> tools = null;
 	
     @Bean
@@ -64,35 +63,29 @@ public class TestConfig {
     
     @Bean
     @Primary
-    Tool toolTestSubject() {
-    	if (tool == null) {
-    		tool = new Tool();
+    List<Tool> toolsTestSubject() {
+    	if (tools == null) {
+    		tools = new ArrayList<Tool>();
+
+    		Tool tool = new Tool();
+    		List<String> tags = new ArrayList<String>();
+
     		tool.setId(1);
     		tool.setTitle("Notion");
     		tool.setLink("https://notion.so");
     		tool.setDescription(
     				"All in one tool to organize teams and ideas. Write, plan, collaborate, and get organized.");
-    		List<String> tags = new ArrayList<String>();
     		tags.add("organization");
     		tags.add("planning");
     		tags.add("collaboration");
     		tags.add("writing");
     		tags.add("calendar");
     		tool.setTags(tags);
-    	}
-		return tool;
-    }
-    
-    @Bean
-    @Primary
-    List<Tool> toolsTestSubject() {
-    	if (tools == null) {
-    		tools = new ArrayList<Tool>();
-    		tools.add(toolTestSubject());
+    		tools.add(tool);
 
-    		Tool tool = new Tool();
-    		List<String> tags = new ArrayList<String>();
-    		tool.setId(1);
+    		tool = new Tool();
+    		tags = new ArrayList<String>();
+    		tool.setId(2);
     		tool.setTitle("json-server");
     		tool.setLink("https://github.com/typicode/json-server");
     		tool.setDescription(
@@ -108,7 +101,7 @@ public class TestConfig {
 
     		tool = new Tool();
     		tags = new ArrayList<String>();
-    		tool.setId(1);
+    		tool.setId(3);
     		tool.setTitle("fastify");
     		tool.setLink("https://www.fastify.io/");
     		tool.setDescription(
