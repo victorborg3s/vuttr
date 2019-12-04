@@ -1,0 +1,20 @@
+.page-title {
+  margin: 16px 0px 0px 0px;
+}
+
+.tool-card {
+    margin-top: 16px;
+}
+
+.vcenter {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.tag {
+    font-weight: bold;
+}
+
+.x{
+    font-weight: bold;
+}

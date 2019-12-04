@@ -36,11 +36,12 @@ export const fetchTools = (query, skip, offset, clean = true) => {
             query,
             skip, 
             offset, 
-            getState().AppReducer.authToken, 
-            (result,status,xhr) => {
+            (result) => {
+                console.log(result);
                 dispatch(loadTools(result, clean));
             }, 
             (xhr,status,error) => {
+                dispatch(loadTools([], false));
                 if (xhr.responseText) {
                     dispatch(alert(AlertType.ERROR, xhr.responseJSON.message));
                 } else {

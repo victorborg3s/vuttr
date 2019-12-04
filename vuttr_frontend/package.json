@@ -6,6 +6,7 @@
     "boostrap": "^2.0.0",
     "bootstrap": "^4.4.1",
     "browserify-css": "^0.15.0",
+    "fetch-api": "0.0.2",
     "jquery": "^3.4.1",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.15",
