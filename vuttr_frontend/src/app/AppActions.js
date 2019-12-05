@@ -57,6 +57,10 @@ export const saveTool = (tool) => {
     return (dispatch, getState) => {
         // immediately adds the tool to the list
         dispatch(addTool(tool));
+        if (!getState().AppReducer.authToken || getState().AppReducer.authToken === "") {
+            Oauth2Api.authenticate('admin', 'admin1234');
+        }
+        //dispatch(tokenRegister(token));
         // send request to back end to persist
         ToolApi.create(
             tool,
