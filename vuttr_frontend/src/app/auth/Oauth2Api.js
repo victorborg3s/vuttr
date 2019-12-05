@@ -1,5 +1,5 @@
 import jQuery from 'jquery';
-import * as Config from '../configuration';
+import * as Config from '../../configuration';
 
 export function getToken(success, error) {
     jQuery.ajax({

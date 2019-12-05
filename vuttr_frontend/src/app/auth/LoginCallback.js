@@ -1,13 +1,28 @@
 import React, { useEffect } from "react";
+import {
+  useLocation
+} from "react-router-dom";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import * as AuthActions from './AuthActions';
 
-const LoginCallback = () => {
+const LoginCallback = (props) => {
+  let location = useLocation();
   useEffect(() => {
-    console.log("blah");
-  }, []);
+    let query = new URLSearchParams(location.hash);
+    const token = query.get("#access_token");
+    if (token) {
+      props.actions.tokenRegister(token);
+    }
+  }, [props.actions, location]);
 
-  return <p>
-    Olá!
-  </p>;
+  return <div>div vazia</div>;
 };
 
-export default LoginCallback;
+const mapStateToProps = state => state.AuthReducer;
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(AuthActions, dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginCallback);

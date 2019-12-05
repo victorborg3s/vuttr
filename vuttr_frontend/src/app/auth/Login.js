@@ -1,28 +1,12 @@
 import React, { useCallback } from "react";
-import { ERoute } from '../../routes';
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
 import { Button } from 'reactstrap';
-import * as Config from '../../configuration';
+import * as AuthActions from './AuthActions';
 
-const Login = () => {
+const Login = (props) => {
 
-  const handleLogin = useCallback(async () => {
-
-    const qParams = [
-      `redirect_uri=http://${window.location.host}${ERoute.OAUTH_CALLBACK}`,
-      `scope=read`,
-      `response_type=token`,
-      `client_id=oauth2-jwt-client`
-    ].join("&");
-
-    try {
-      let requestUrl = `${Config.AUTH_AUTHORIZATION_URL}?${qParams}`;
-      console.log(requestUrl);
-      window.location.assign(requestUrl);
-    } catch (e) {
-      console.error(e);
-    }
-
-  }, []);
+  const handleLogin = useCallback(props.actions.openLoginPage, []);
 
   return (
     <Button variant="contained" color="primary" onClick={handleLogin}>
@@ -31,4 +15,10 @@ const Login = () => {
   );
 };
 
-export default Login;
+const mapStateToProps = state => state.AppReducer;
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(AuthActions, dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

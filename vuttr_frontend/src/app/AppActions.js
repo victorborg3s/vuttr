@@ -1,5 +1,5 @@
 import { ToolApi } from './tool';
-import { Oauth2Api } from './index';
+import { AuthActions } from './auth';
 import { AlertType } from './commons';
 import * as _ from 'lodash/core';
 
@@ -58,7 +58,7 @@ export const saveTool = (tool) => {
         // immediately adds the tool to the list
         dispatch(addTool(tool));
         if (!getState().AppReducer.authToken || getState().AppReducer.authToken === "") {
-            Oauth2Api.authenticate('admin', 'admin1234');
+            dispatch(AuthActions.openLoginPage());
         }
         //dispatch(tokenRegister(token));
         // send request to back end to persist
@@ -104,38 +104,6 @@ export const deleteTool = (tool) => {
             }, 
         );
 
-    }
-}
-
-export const signIn = (username, password, browserHistory) => {
-    return (dispatch) => {
-        Oauth2Api.authenticate(
-            username, 
-            password, 
-            (result,status,xhr) => {
-                dispatch(tokenRegister(xhr.getResponseHeader("authorization")));
-                dispatch(alert(AlertType.SUCCESS, 'Autenticação bem sucedida.'));
-                browserHistory.push('/');
-            }, 
-            (xhr,status,error) => {
-                if (xhr.responseText) {
-                    if (xhr.responseText === "org.springframework.web.client.HttpClientErrorException: 401 Unauthorized") {
-                        dispatch(alert(AlertType.ERROR, 'Usuário não encontrado. Verifique o login e senha digitados.'));
-                    } else {
-                        if (xhr.responseJSON) {
-                            dispatch(alert(AlertType.ERROR, xhr.responseJSON.message));
-                        } else {
-                            dispatch(alert(AlertType.ERROR, 'Usuário não encontrado. Verifique o login e senha digitados.'));
-                        }
-                    }
-                }
-                else if (xhr.status === 403) {
-                    dispatch(alert(AlertType.ERROR, "Usuário não encontrado. Verifique o login e senha digitados."));
-                } else {
-                    dispatch(alert(AlertType.ERROR, 'Erro de conexão com o servidor. Verifique sua conexão com a internet.'));
-                }
-            }, 
-        );
     }
 }
 
