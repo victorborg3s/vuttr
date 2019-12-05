@@ -1,15 +1,14 @@
-# Use user/password credentials
 version: '3.7'
 
 services:
 
-#  resource:
-#    image: vuttr/resource
-#    build: .
-#    depends_on:
-#      - resource_db
-#    ports:
-#      - 3000:3000
+  resource:
+    image: vuttr/resource
+    build: .
+    depends_on:
+      - resource_db
+    ports:
+      - 3000:3000
 
   oauth2:
     image: vuttr/oauth2
