@@ -7,7 +7,8 @@ const initialState = {
   tools: [],
   alerts: [],
   authToken: "",
-  sessionUser: {}
+  sessionUser: {},
+  isToolFormOpen: false,
 };
 
 export default function AppReducer(state = initialState, action) {
@@ -15,12 +16,24 @@ export default function AppReducer(state = initialState, action) {
   switch (action.type) {
     case AppActions.TOOLS_ADD: {
       return {
-        ...state
+        ...state,
+        tools:[
+          action.tool,
+          ...state.tools,
+        ]
       };
     }
     case AppActions.TOOLS_UNDO_ADD: {
       return {
         ...state
+      };
+    }
+    case AppActions.TOOLS_UPDATE_ID: {
+      let tool = state.tools.find(t => t.title === action.tool.title);
+      tool.id = action.tool.id;
+      return {
+        ...state,
+        isToolFormOpen: !state.isToolFormOpen,
       };
     }
     case AppActions.TOOLS_DELETE: {
@@ -31,6 +44,12 @@ export default function AppReducer(state = initialState, action) {
     case AppActions.TOOLS_UNDO_DELETE: {
       return {
         ...state
+      };
+    }
+    case AppActions.TOOLS_TOGGLE_FORM: {
+      return {
+        ...state,
+        isToolFormOpen: !state.isToolFormOpen,
       };
     }
     case AppActions.TOOLS_LOADING: {

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useToolForm } from './useToolForm';
 import { BrowserRouter } from "react-router-dom";
 import * as AppActions from "./AppActions";
 import * as _ from "lodash/core";
@@ -21,43 +20,46 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardText,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Form,
-  FormGroup,
-  FormText,
+  CardText
 } from "reactstrap";
-import { Login } from './auth';
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { Login } from "./auth";
 import { Routes } from "../routes";
+import { ToolModalForm } from "./tool";
 import "./App.css";
 
-export function App(props) {
+function App(props) {
+
   useEffect(() => {
     if (props.fetchState === "todo") {
       props.actions.fetchTools(undefined, 0, 999);
     }
   });
+  
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+  const toggleMenu = () => setMenuIsOpen(!menuIsOpen);
 
-  const [isOpen, setIsOpen] = useState(false);
-  const toggle = () => setIsOpen(!isOpen);
-
-  const [modal, setModal] = useState(false);
-  const toggleModal = () => setModal(!modal);
-
-  const createTool = () => {
-    let tool = {
-      title: inputs.title,
-      link: inputs.link,
-      description: inputs.description,
-      tags: inputs.tags.split(' ')
-    };
-    console.log(tool);
-    props.actions.saveTool(tool);
+  const [tool, setTool] = useState({title: '', link: '', description: '', tags: ''});
+  const toolInputChange = (event) => {
+    event.persist();
+    setTool(inputs => ({...inputs, [event.target.name]: event.target.value}));
   }
-  const { handleSubmit, handleInputChange, inputs } = useToolForm(createTool);
+  
+  const toolSave = (event) => {
+    if (event) {
+      event.preventDefault();
+    }
+    let newTool = {
+      ...tool,
+      /*
+        if it's empty, react will launch a warning:
+        "Each child in a list should have a unique "key" prop."
+      */
+      id: _.uniqueId(),
+      tags: tool.tags.split(" ")
+    }
+    props.actions.saveTool(newTool);
+  }
 
   let loading = "";
   if (props.fetchState === "loading") {
@@ -70,47 +72,23 @@ export function App(props) {
 
   return (
     <BrowserRouter>
-      <Modal isOpen={modal} toggle={toggleModal}>
-        <ModalHeader toggle={toggle}><MdAdd color="black" />Add new tool</ModalHeader>
-        <ModalBody>
-          <Form>
-            <FormGroup>
-              <Label for="toolTitle">Tool Name</Label>
-              <Input type="text" name="title" id="toolTitle" onChange={handleInputChange} value={inputs.title} />
-            </FormGroup>
-            <FormGroup>
-              <Label for="toolLink">Tool Name</Label>
-              <Input type="text" name="link" id="toolLink" onChange={handleInputChange} value={inputs.link} />
-            </FormGroup>
-            <FormGroup>
-              <Label for="toolDescription">Tool Description</Label>
-              <Input type="textarea" name="description" id="toolDescription" onChange={handleInputChange} value={inputs.description} />
-            </FormGroup>
-            <FormGroup>
-              <Label for="toolTags">Tags</Label>
-              <Input type="text" name="tags" id="toolTags" onChange={handleInputChange} value={inputs.tags} />
-              <FormText color="muted">
-                Put any number of tags separated by one white space between each one
-              </FormText>
-            </FormGroup>
-            <Button onClick={handleSubmit}>Submit</Button>
-          </Form>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={toggle}>Do Something</Button>{' '}
-          <Button color="secondary" onClick={toggle}>Cancel</Button>
-        </ModalFooter>
-      </Modal>
+      <ToolModalForm
+        isOpen={props.isToolFormOpen}
+        toggle={props.actions.toggleToolForm}
+        tool={tool}
+        inputChangeHandler={toolInputChange}
+        onSave={toolSave}
+        onCancel={props.actions.toggleToolForm}
+      />
       <Container>
         <Row>
           <Col>
             <Navbar color="light" light={true} expand="md" fixed="fixed">
               <Container>
                 <NavbarBrand href="/">VUTTR</NavbarBrand>
-                <NavbarToggler onClick={toggle} />
-                <Collapse isOpen={isOpen} navbar>
-                  <Nav className="mr-auto" navbar>
-                  </Nav>
+                <NavbarToggler onClick={toggleMenu} />
+                <Collapse isOpen={menuIsOpen} navbar>
+                  <Nav className="mr-auto" navbar></Nav>
                   <Nav>
                     <Login />
                   </Nav>
@@ -145,7 +123,7 @@ export function App(props) {
           </Col>
           <Col className="vcenter">
             <div className="float-right">
-              <Button onClick={toggleModal} color="primary">
+              <Button onClick={props.actions.toggleToolForm} color="primary">
                 <MdAdd color="white" />
                 add
               </Button>
@@ -154,32 +132,41 @@ export function App(props) {
         </Row>
         <Row>
           <Col>
-            {props.tools.map(tool => (
-              <Card key={tool.id} className="tool-card">
-                <CardHeader>
-                  <div className="float-left">
-                    <Button color="link" onClick={() => window.open(tool.link, "_blank")}>{tool.title}</Button>
-                  </div>
-                  <div className="float-right">
-                    <Button color="link">
-                      <span className="x">x</span>&nbsp;remove
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  <CardText>
-                    <span>{tool.description}</span>
-                    <br />
-                    <br />
-                    {tool.tags.map(tag => (
-                      <span key={_.uniqueId("tag_")} className="tag">
-                        {"#" + tag}&nbsp;
-                      </span>
-                    ))}
-                  </CardText>
-                </CardBody>
-              </Card>
-            ))}
+            <TransitionGroup className="todo-list">
+              {props.tools.map(tool => (
+                <CSSTransition key={tool.id} timeout={500} classNames="item">
+                  <Card className="tool-card">
+                    <CardHeader>
+                      <div className="float-left">
+                        <Button
+                          color="link"
+                          onClick={() => window.open(tool.link, "_blank")}
+                        >
+                          {tool.title}
+                        </Button>
+                      </div>
+                      <div className="float-right">
+                        <Button color="link">
+                          <span className="x">x</span>&nbsp;remove
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardBody>
+                      <CardText>
+                        <span>{tool.description}</span>
+                        <br />
+                        <br />
+                        {tool.tags.map(tag => (
+                          <span key={_.uniqueId("tag_")} className="tag">
+                            {"#" + tag}&nbsp;
+                          </span>
+                        ))}
+                      </CardText>
+                    </CardBody>
+                  </Card>
+                </CSSTransition>
+              ))}
+            </TransitionGroup>
           </Col>
         </Row>
         {loading}

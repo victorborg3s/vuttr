@@ -26,7 +26,7 @@ export function create(entity, jwToken, success, error) {
         contentType: "application/json; charset=utf-8",
         type: 'POST',
         headers: {
-            authorization: jwToken
+            authorization: `Bearer ${jwToken}`
         },
         data: JSON.stringify(entity),
         success,

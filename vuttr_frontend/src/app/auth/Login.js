@@ -1,33 +1,39 @@
 import React, { useCallback } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { Button } from 'reactstrap';
-import MdPerson from 'react-ionicons/lib/MdPerson';
-import * as AuthActions from './AuthActions';
-import './Login.css';
+import { Button } from "reactstrap";
+import MdPerson from "react-ionicons/lib/MdPerson";
+import * as AuthActions from "./AuthActions";
+import "./Login.css";
 
-const Login = (props) => {
-
+const LoginComponent = props => {
   const handleLogin = useCallback(props.actions.openLoginPage, []);
   const handleLogout = useCallback(props.actions.signOut, []);
-  if (props.userToken && props.userToken !== "") {
+  const someoneSignedIn =
+    typeof props.userToken !== "undefined" && props.userToken !== "";
+
+  if (!someoneSignedIn) {
     return (
-      <>
-        <div className="vcenter">
-          {props.userName}&nbsp;<MdPerson color="#007bff" />
-          (
-          <Button size="sm" variant="contained" color="link" onClick={handleLogout}>
-              Sign Out
-          </Button>
-          )
-        </div>
-      </>
+      <Button variant="contained" color="link" onClick={handleLogin}>
+        Login with VUTTR&nbsp;
+        <MdPerson color="#007bff" />
+      </Button>
     );
   } else {
     return (
-      <Button variant="contained" color="link" onClick={handleLogin}>
-        Login with VUTTR&nbsp;<MdPerson color="#007bff" />
-      </Button>
+      <div className="vcenter">
+        {props.userName}&nbsp;
+        <MdPerson color="#007bff" />(
+        <Button
+          size="sm"
+          variant="contained"
+          color="link"
+          onClick={handleLogout}
+        >
+          Sign Out
+        </Button>
+        )
+      </div>
     );
   }
 };
@@ -38,4 +44,4 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(AuthActions, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginComponent);
