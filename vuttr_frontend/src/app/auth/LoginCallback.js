@@ -1,22 +1,25 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
-  useLocation
+  useLocation,
+  useHistory
 } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import * as AuthActions from './AuthActions';
 
 const LoginCallback = (props) => {
+  let history = useHistory();
   let location = useLocation();
+  let { tokenRegister } = props.actions;
   useEffect(() => {
     let query = new URLSearchParams(location.hash);
     const token = query.get("#access_token");
     if (token) {
-      props.actions.tokenRegister(token);
+      tokenRegister(token);
+      history.push(props.whereToRedirectAfterOauthCallback);
     }
-  }, [props.actions, location]);
-
-  return <div>div vazia</div>;
+  }, [tokenRegister, location, history, props.whereToRedirectAfterOauthCallback]);
+  return null;
 };
 
 const mapStateToProps = state => state.AuthReducer;

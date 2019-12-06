@@ -37,7 +37,6 @@ export const fetchTools = (query, skip, offset, clean = true) => {
             skip, 
             offset, 
             (result) => {
-                console.log(result);
                 dispatch(loadTools(result, clean));
             }, 
             (xhr,status,error) => {

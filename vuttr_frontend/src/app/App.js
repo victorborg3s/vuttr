@@ -14,10 +14,6 @@ import {
   NavbarToggler,
   NavbarBrand,
   Nav,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
   Row,
   Input,
   Label,
@@ -32,7 +28,7 @@ import {
   ModalFooter,
   Form,
   FormGroup,
-  FormText
+  FormText,
 } from "reactstrap";
 import { Login } from './auth';
 import { Routes } from "../routes";
@@ -108,31 +104,29 @@ export function App(props) {
       <Container>
         <Row>
           <Col>
-            <Navbar color="light" light expand="md">
-              <NavbarBrand href="/">VUTTR</NavbarBrand>
-              <NavbarToggler onClick={toggle} />
-              <Collapse isOpen={isOpen} navbar>
-                <Nav className="mr-auto" navbar>
-                  <UncontrolledDropdown nav inNavbar>
-                    <DropdownToggle nav caret>
-                      Options
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>Option 1</DropdownItem>
-                      <DropdownItem>Option 2</DropdownItem>
-                      <DropdownItem divider />
-                      <DropdownItem>Reset</DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                </Nav>
-              </Collapse>
+            <Navbar color="light" light={true} expand="md" fixed="fixed">
+              <Container>
+                <NavbarBrand href="/">VUTTR</NavbarBrand>
+                <NavbarToggler onClick={toggle} />
+                <Collapse isOpen={isOpen} navbar>
+                  <Nav className="mr-auto" navbar>
+                  </Nav>
+                  <Nav>
+                    <Login />
+                  </Nav>
+                </Collapse>
+              </Container>
             </Navbar>
           </Col>
         </Row>
         <Row>
           <Col className="page-title">
             <h3>Very Useful Tools to Remember</h3>
-            <hr></hr>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <hr />
           </Col>
         </Row>
         <Row>
@@ -189,11 +183,6 @@ export function App(props) {
           </Col>
         </Row>
         {loading}
-        <Row>
-          <Col>
-            <Login></Login>
-          </Col>
-        </Row>
         <Row>
           <Col>
             <Routes {...props} />
