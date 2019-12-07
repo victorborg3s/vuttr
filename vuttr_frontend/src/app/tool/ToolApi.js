@@ -36,14 +36,13 @@ export function create(entity, jwToken, success, error) {
 
 export function remove(entity, jwToken, success, error) {
     jQuery.ajax({
-        url: `${Config.API_URL}/${ENDPOINT}`,
+        url: `${Config.API_URL}/${ENDPOINT}/${entity.id}`,
         dataType: "json",
         contentType: "application/json; charset=utf-8",
-        type: 'POST',
+        type: 'DELETE',
         headers: {
-            authorization: jwToken
+            authorization: `Bearer ${jwToken}`
         },
-        data: JSON.stringify(entity),
         success,
         error
     });

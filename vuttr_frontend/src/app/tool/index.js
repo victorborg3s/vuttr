@@ -1,9 +1,11 @@
 import * as ToolApi from './ToolApi';
-import ToolsList from './ToolsList';
-import ToolModalForm from './ToolModalForm';
+import ToolPage from './ToolPage';
+import * as ToolActions from './ToolActions';
+import ToolReducer from './ToolReducer';
 
 export {
     ToolApi,
-    ToolsList,
-    ToolModalForm,
+    ToolPage,
+    ToolActions,
+    ToolReducer
 };
