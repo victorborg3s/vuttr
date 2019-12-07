@@ -41,7 +41,7 @@ public class ToolController {
 		if (tag != null && !tag.isEmpty()) {
 			return toolDao.findByTag(tag);
 		}
-		return toolDao.findAll();
+		return toolDao.findAllByOrderByIdDesc();
 	}
 
 	/**

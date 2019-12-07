@@ -12,4 +12,6 @@ public interface ToolDao extends JpaRepository<Tool, Integer> {
 
 	@Query(value = "SELECT t FROM Tool t JOIN t.tags s WHERE :tag = s")
 	List<Tool> findByTag(@Param("tag") String tag);
+	
+	List<Tool> findAllByOrderByIdDesc();
 }
