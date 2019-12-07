@@ -1,4 +1,6 @@
-import * as _ from "lodash/core";
+import React from 'react';
+import { toast } from 'react-toastify';
+import { AlertType } from "./commons";
 
 export const APP_SIGN_OUT = "APP_SIGN_OUT";
 export const APP_TOKEN_REGISTER = "APP_TOKEN_REGISTER";
@@ -18,12 +20,24 @@ export const alertDismiss = messageId => ({
   messageId
 });
 
-export const alert = (alertType, message) => {
+export const alert = (type, message) => {
+  const messageComponent = (typeAsText, message) => (
+    <div>
+      <div>
+        <p style={{fontWeight: "bold"}}>{typeAsText}</p>
+      </div>
+      <div>
+        {message}
+      </div>
+    </div>
+  );
   return dispatch => {
-    let messageId = _.uniqueId("message_");
-    dispatch(alertShow(messageId, alertType, message));
-    setTimeout(() => {
-      dispatch(alertDismiss(messageId));
-    }, 3500);
+    switch (type) {
+      case AlertType.SUCCESS: toast.success(messageComponent("Success", message)); break;
+      case AlertType.WARNING: toast.warning(messageComponent("Warning", message)); break;
+      case AlertType.INFO: toast.info(messageComponent("Info", message)); break;
+      case AlertType.ERROR: toast.error(messageComponent("Error", message)); break;
+      default: toast(messageComponent("Error", message)); break;
+    }
   };
-};
+}

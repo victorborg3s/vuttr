@@ -82,6 +82,10 @@ export const saveTool = tool => {
           // if error, then remove the added tool and show message error to user
           dispatch(removeTool(tool));
           if (xhr.responseText) {
+            AppActions.alert(
+              //AlertType.ERROR,
+              "Erro de conexão com o servidor. Verifique sua conexão com a internet."
+            );
             dispatch(AppActions.alert(AlertType.ERROR, xhr.responseJSON.message));
           } else {
             dispatch(

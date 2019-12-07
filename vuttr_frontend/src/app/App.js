@@ -15,6 +15,8 @@ import {
 } from "reactstrap";
 import { Login } from "./auth";
 import { Routes } from "../routes";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
 function App(props) {
@@ -54,6 +56,7 @@ function App(props) {
         <Row>
           <Col>
             <Routes {...props} />
+            <ToastContainer autoClose={5000} />
           </Col>
         </Row>
       </Container>
