@@ -3,7 +3,7 @@ import { ERoute } from "../routes";
 
 const initialState = {
   currentPage: ERoute.HOME,
-  alerts: [],
+  dialogProps: {isOpen: false}
 };
 
 export default function AppReducer(state = initialState, action) {
@@ -24,9 +24,22 @@ export default function AppReducer(state = initialState, action) {
         ...state
       };
     }
-    case AppActions.APP_ALERT_DISMISS: {
+    case AppActions.APP_SHOW_DIALOG: {
       return {
-        ...state
+        ...state,
+        dialogProps: {
+          ...action.props,
+          isOpen: true
+        }
+      };
+    }
+    case AppActions.APP_HIDE_DIALOG: {
+      return {
+        ...state,
+        dialogProps: {
+          ...state.dialogProps,
+          isOpen: false
+        }
       };
     }
     default:

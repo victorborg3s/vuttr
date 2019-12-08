@@ -14,6 +14,7 @@ import {
   Row,
 } from "reactstrap";
 import { Login } from "./auth";
+import { ModalDialog } from './commons';
 import { Routes } from "../routes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -26,6 +27,7 @@ function App(props) {
 
   return (
     <BrowserRouter>
+      <ModalDialog {...props.dialogProps } onClose={props.actions.dialogHide} />
       <Container>
         <Row>
           <Col>

@@ -1,11 +1,11 @@
-import React from 'react';
-import { toast } from 'react-toastify';
-import { AlertType } from "./commons";
+import { toast } from "react-toastify";
+import { AlertType, AlertMessage } from "./commons";
 
 export const APP_SIGN_OUT = "APP_SIGN_OUT";
 export const APP_TOKEN_REGISTER = "APP_TOKEN_REGISTER";
 export const APP_ALERT_SHOW = "APP_ALERT_SHOW";
-export const APP_ALERT_DISMISS = "APP_ALERT_DISMISS";
+export const APP_SHOW_DIALOG = "APP_SHOW_DIALOG";
+export const APP_HIDE_DIALOG = "APP_HIDE_DIALOG";
 
 export const signOut = () => ({ type: APP_SIGN_OUT });
 export const tokenRegister = token => ({ type: APP_TOKEN_REGISTER, token });
@@ -15,29 +15,27 @@ export const alertShow = (messageId, alertType, message) => ({
   alertType,
   message
 });
-export const alertDismiss = messageId => ({
-  type: APP_ALERT_DISMISS,
-  messageId
-});
+export const dialogShow = (props) => ({ type: APP_SHOW_DIALOG, props });
+export const dialogHide = () => ({ type: APP_HIDE_DIALOG });
 
 export const alert = (type, message) => {
-  const messageComponent = (typeAsText, message) => (
-    <div>
-      <div>
-        <p style={{fontWeight: "bold"}}>{typeAsText}</p>
-      </div>
-      <div>
-        {message}
-      </div>
-    </div>
-  );
   return dispatch => {
     switch (type) {
-      case AlertType.SUCCESS: toast.success(messageComponent("Success", message)); break;
-      case AlertType.WARNING: toast.warning(messageComponent("Warning", message)); break;
-      case AlertType.INFO: toast.info(messageComponent("Info", message)); break;
-      case AlertType.ERROR: toast.error(messageComponent("Error", message)); break;
-      default: toast(messageComponent("Error", message)); break;
+      case AlertType.SUCCESS:
+        toast.success(AlertMessage({ title: "Success", content: message }));
+        break;
+      case AlertType.WARNING:
+        toast.warning(AlertMessage({ title: "Success", content: message }));
+        break;
+      case AlertType.INFO:
+        toast.info(AlertMessage({ title: "Success", content: message }));
+        break;
+      case AlertType.ERROR:
+        toast.error(AlertMessage({ title: "Success", content: message }));
+        break;
+      default:
+        toast(AlertMessage({ title: "Success", content: message }));
+        break;
     }
   };
-}
+};
