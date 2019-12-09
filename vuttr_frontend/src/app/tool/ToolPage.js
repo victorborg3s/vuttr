@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import MdAdd from "react-ionicons/lib/MdAdd";
@@ -11,18 +11,34 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardText
+  CardText,
+  Spinner
 } from "reactstrap";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import * as _ from "lodash/core";
 import ToolModalForm from "./ToolModalForm";
 import * as ToolActions from "./ToolActions";
+import { DataStatus } from "../../utils";
 import "./ToolPage.css";
 
 const ToolPage = props => {
+  window.onscroll = () => {
+    if (
+      props.dataHasMore &&
+      props.dataStatus === DataStatus.LOADED &&
+      window.innerHeight + document.documentElement.scrollTop >=
+        0.7 * document.documentElement.offsetHeight
+    ) {
+      props.actions.fetch(
+        props.dataPage,
+        false
+      );
+    }
+  };
+
   useEffect(() => {
-    if (props.fetchState === "todo") {
-      props.actions.fetchTools(undefined, 0, 999);
+    if (props.dataStatus === DataStatus.INITIAL_LOAD) {
+      props.actions.fetch(0);
     }
   });
 
@@ -32,6 +48,14 @@ const ToolPage = props => {
     description: "",
     tags: ""
   });
+
+  const toggleSearchOnlyTags = () => {
+    props.actions.applyFilter(!props.searchOnlyTags, props.searchTerm);
+  };
+  const onSearchTermChange = (event) => {
+    props.actions.applyFilter(props.searchOnlyTags, event.target.value);
+  };
+
   const toolInputChange = event => {
     event.persist();
     setTool(inputs => ({ ...inputs, [event.target.name]: event.target.value }));
@@ -50,15 +74,17 @@ const ToolPage = props => {
       id: _.uniqueId(),
       tags: tool.tags.split(" ")
     };
-    props.actions.saveTool(newTool);
+    props.actions.save(newTool);
     setTool({ title: "", link: "", description: "", tags: "" });
   };
 
   let loading = "";
-  if (props.fetchState === "loading") {
+  if (props.dataStatus !== DataStatus.LOADED) {
     loading = (
       <Row>
-        <Col>Loading...</Col>
+        <Col style={{ textAlign: "center" }}>
+          <Spinner color="primary" />
+        </Col>
       </Row>
     );
   }
@@ -66,25 +92,25 @@ const ToolPage = props => {
   return (
     <>
       <ToolModalForm
-        isOpen={props.isToolFormOpen}
-        toggle={props.actions.toggleToolForm}
+        isOpen={props.isFormOpen}
+        toggle={props.actions.toggleForm}
         tool={tool}
         inputChangeHandler={toolInputChange}
         onSave={toolSave}
-        onCancel={props.actions.toggleToolForm}
+        onCancel={props.actions.toggleForm}
       />
       <Row>
         <Col>
-          <Input type="search" name="search" id="search" placeholder="search" />
+          <Input type="search" name="search" id="search" placeholder="search" value={props.searchTerm} onChange={onSearchTermChange} />
         </Col>
         <Col className="vcenter">
           <Label check>
-            <Input type="checkbox" /> search in tags only
+            <Input type="checkbox" value={props.searchOnlyTags} onChange={toggleSearchOnlyTags} /> search in tags only
           </Label>
         </Col>
         <Col className="vcenter">
           <div className="float-right">
-            <Button onClick={props.actions.toggleToolForm} color="primary">
+            <Button onClick={props.actions.toggleForm} color="primary">
               <MdAdd color="white" />
               add
             </Button>
@@ -94,7 +120,7 @@ const ToolPage = props => {
       <Row>
         <Col>
           <TransitionGroup className="todo-list">
-            {props.tools.map(tool => (
+            {props.filteredData.map(tool => (
               <CSSTransition key={tool.id} timeout={500} classNames="item">
                 <Card className="tool-card">
                   <CardHeader>
@@ -107,7 +133,10 @@ const ToolPage = props => {
                       </Button>
                     </div>
                     <div className="float-right">
-                      <Button onClick={() => props.actions.deleteTool(tool)} color="link">
+                      <Button
+                        onClick={() => props.actions.deleteTool(tool)}
+                        color="link"
+                      >
                         <span className="x">x</span>&nbsp;remove
                       </Button>
                     </div>

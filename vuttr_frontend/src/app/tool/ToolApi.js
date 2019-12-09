@@ -6,10 +6,9 @@ const ENDPOINT = "tools";
 //error(xhr,status,error)
 //success(result,status,xhr)
 
-export function list(query, skip, offset, success, error) {
-    let queryParam = (query && query !== "") ? `tag=${query}&` : "";
+export function list(page, success, error) {
     jQuery.ajax({
-        url: `${Config.API_URL}/${ENDPOINT}?${queryParam}skip=${skip}&offset=${offset}`,
+        url: `${Config.API_URL}/${ENDPOINT}/paginated?page=${page}`,
         dataType: "json",
         contentType: "application/json; charset=utf-8",
         type: 'GET',

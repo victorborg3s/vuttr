@@ -1,60 +1,99 @@
 import * as ToolActions from "./ToolActions";
+import { DataStatus } from "../../utils";
 
 const initialState = {
-  fetchState: "todo",
-  tools: [],
-  isToolFormOpen: false,
+  data: [],
+  dataPage: 0,
+  dataHasMore: false,
+  dataStatus: DataStatus.INITIAL_LOAD,
+  filteredData: [],
+  searchTerm: "",
+  searchOnlyTags: false,
+  isFormOpen: false
 };
+
+const applyFilter = (data, onlyTags, term) => {
+  console.log("data", data);
+  console.log("onlyTags", onlyTags);
+  console.log("term", term);
+  let filteredData = data.filter((tool) => {
+    if (onlyTags) return tool.tags.some( (tag) => tag.indexOf(term) > -1)
+    else return tool.tags.some( (tag) => tag.indexOf(term) > -1) || (tool.title.indexOf(term) > -1) || (tool.description.indexOf(term) > -1);
+  });
+  console.log("filteredData", filteredData);
+  return filteredData;
+}
 
 export default function AppReducer(state = initialState, action) {
   switch (action.type) {
-    case ToolActions.TOOL_ADD: {
+    case ToolActions.DATA_PENDING: {
       return {
         ...state,
-        isToolFormOpen: !state.isToolFormOpen,
-        tools:[
-          action.tool,
-          ...state.tools,
-        ]
+        dataStatus: DataStatus.PENDING
       };
     }
-    case ToolActions.TOOL_UPDATE_ID: {
-      let tool = state.tools.find(t => t.title === action.tool.title);
+    case ToolActions.DATA_LOAD: {
+      let newDataPage;
+      let newData;
+      if (action.clean) {
+        newDataPage = 0;
+        newData = [...action.paginatedResult.content];
+      } else {
+        newDataPage = state.dataPage + 1;
+        newData = [...state.data, ...action.paginatedResult.content];
+      }
+      return {
+        ...state,
+        dataStatus: DataStatus.LOADED,
+        data: newData,
+        filteredData: applyFilter(newData, state.searchOnlyTags, state.searchTerm),
+        dataPage: newDataPage,
+        dataHasMore:
+          action.paginatedResult &&
+          action.paginatedResult.content &&
+          action.paginatedResult.content.length === action.paginatedResult.size
+      };
+    }
+    case ToolActions.DATA_ERROR: {
+      return {
+        ...state,
+      };
+    }
+    case ToolActions.DATA_FILTER: {
+      return {
+        ...state,
+        searchTerm: action.searchTerm,
+        searchOnlyTags: action.searchOnlyTags,
+        filteredData: applyFilter(state.data, action.searchOnlyTags, action.searchTerm)
+      };
+    }
+    case ToolActions.ADD: {
+      console.log("Erro: passei por aqui!");
+      return {
+        ...state,
+        isFormOpen: !state.isFormOpen,
+        data: [action.tool, ...state.data],
+      };
+    }
+    case ToolActions.UPDATE_ID: {
+      let tool = state.data.find(t => t.title === action.tool.title);
       tool.id = action.tool.id;
       return {
         ...state,
-        isToolFormOpen: !state.isToolFormOpen,
+        isFormOpen: !state.isFormOpen
       };
     }
-    case ToolActions.TOOL_DELETE: {
-      let newToolList = state.tools.filter((t) => t.id !== action.tool.id);
+    case ToolActions.DELETE: {
+      let newToolList = state.data.filter(t => t.id !== action.tool.id);
       return {
         ...state,
-        tools: newToolList
+        data: newToolList
       };
     }
-    case ToolActions.TOOL_TOGGLE_FORM: {
+    case ToolActions.TOGGLE_FORM: {
       return {
         ...state,
-        isToolFormOpen: !state.isToolFormOpen,
-      };
-    }
-    case ToolActions.TOOL_LOADING: {
-      return {
-        ...state,
-        fetchState: "loading"
-      };
-    }
-    case ToolActions.TOOL_LOAD: {
-      return {
-        ...state,
-        fetchState: "loaded",
-        tools: [...state.tools, ...action.tools]
-      };
-    }
-    case ToolActions.TOOL_FILTER: {
-      return {
-        ...state
+        isFormOpen: !state.isFormOpen
       };
     }
     default:

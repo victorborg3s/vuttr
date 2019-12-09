@@ -3,59 +3,78 @@ import { AuthActions } from "../auth";
 import { AppActions } from "../";
 import { AlertType } from "../commons";
 import { ModalDialogType } from "../commons/ModalDialog";
+import { isAuthenticated, getUserToken } from "../../utils";
 
-export const TOOL_ADD = "TOOLS_ADD";
-export const TOOL_UPDATE_ID = "TOOLS_UPDATE_ID";
-export const TOOL_DELETE = "TOOLS_DELETE";
-export const TOOL_TOGGLE_FORM = "TOOLS_TOGGLE_FORM";
-export const TOOL_LOADING = "TOOLS_LOADING";
-export const TOOL_LOAD = "TOOLS_LOAD";
-export const TOOL_FILTER = "TOOLS_FILTER";
+export const DATA_PENDING = "TOOLS_DATA_PENDING";
+export const DATA_LOAD = "TOOLS_DATA_LOAD";
+export const DATA_ERROR = "TOOLS_DATA_ERROR";
+export const DATA_FILTER = "TOOLS_DATA_FILTER";
+export const ADD = "TOOLS_ADD";
+export const UPDATE_ID = "TOOLS_UPDATE_ID";
+export const DELETE = "TOOLS_DELETE";
+export const TOGGLE_FORM = "TOOLS_TOGGLE_FORM";
 
-export const addTool = tool => ({ type: TOOL_ADD, tool });
-export const updateToolId = tool => ({ type: TOOL_UPDATE_ID, tool });
-export const removeTool = tool => ({ type: TOOL_DELETE, tool });
-export const effectiveToggleToolForm = () => ({ type: TOOL_TOGGLE_FORM });
-export const loadingTools = () => ({ type: TOOL_LOADING });
-export const loadTools = (tools, clean) => ({ type: TOOL_LOAD, tools, clean });
-export const filterTools = query => ({ type: TOOL_FILTER, query });
+export const dataLoading = () => ({ type: DATA_PENDING });
+export const dataError = () => ({ type: DATA_ERROR });
+export const dataLoadResult = (paginatedResult, clean) => ({
+  type: DATA_LOAD,
+  paginatedResult,
+  clean
+});
+export const addToList = tool => ({ type: ADD, tool });
+export const removeFromList = tool => ({ type: DELETE, tool });
+export const updateId = tool => ({ type: UPDATE_ID, tool });
+export const effectiveToggleForm = () => ({ type: TOGGLE_FORM });
+export const applyDataFilter = (searchOnlyTags, searchTerm) => ({
+  type: DATA_FILTER,
+  searchOnlyTags,
+  searchTerm
+});
 
-const requireLogin = (dispatch) => {
+export const applyFilter = (searchOnlyTags, searchTerm) => {
+  return (dispatch, getState) => {
+    dispatch(applyDataFilter(searchOnlyTags, searchTerm));
+    if (getState().ToolReducer.filteredData.length < 10) {
+      dispatch(fetch(
+        getState().ToolReducer.dataPage,
+        false
+      ));
+    }
+  }
+};
+
+const requireLogin = dispatch => {
   dispatch(
     AppActions.dialogShow({
       dialogType: ModalDialogType.OK_CANCEL,
       message:
         "This operation requires a fully authenticated user. You will be redirected to a login page.",
-      onOkClick: () => dispatch(AuthActions.openLoginPage()),
+      onOkClick: () => dispatch(AuthActions.openLoginPage())
     })
   );
-}
+};
 
-export const toggleToolForm = () => {
+export const toggleForm = () => {
   return (dispatch, getState) => {
-    if (
-      getState().AuthReducer.userToken &&
-      getState().AuthReducer.userToken !== ""
-    ) {
-      dispatch(effectiveToggleToolForm());
+    console.log(isAuthenticated);
+    if (isAuthenticated(getState())) {
+      dispatch(effectiveToggleForm());
     } else {
       requireLogin(dispatch);
     }
   };
 };
 
-export const fetchTools = (query, skip, offset, clean = true) => {
+export const fetch = (page, clean = true) => {
   return dispatch => {
-    dispatch(loadingTools());
+    dispatch(dataLoading());
     ToolApi.list(
-      query,
-      skip,
-      offset,
+      page,
       result => {
-        dispatch(loadTools(result, clean));
+        dispatch(dataLoadResult(result, clean));
       },
       (xhr, status, error) => {
-        dispatch(loadTools([], false));
+        dispatch(dataError());
         if (xhr.responseText) {
           dispatch(AppActions.alert(AlertType.ERROR, xhr.responseJSON.message));
         } else {
@@ -71,32 +90,29 @@ export const fetchTools = (query, skip, offset, clean = true) => {
   };
 };
 
-export const saveTool = tool => {
+export const save = tool => {
   return (dispatch, getState) => {
-    if (
-      !getState().AuthReducer.userToken ||
-      getState().AuthReducer.userToken === ""
-    ) {
+    if (!isAuthenticated(getState())) {
       requireLogin(dispatch);
     } else {
       // immediately adds the tool to the list
-      dispatch(addTool(tool));
+      dispatch(addToList(tool));
       //dispatch(tokenRegister(token));
       // send request to back end to persist
       ToolApi.create(
         tool,
-        getState().AuthReducer.userToken,
+        getUserToken(getState()),
         (result, status, xhr) => {
           // if success, update id
-          dispatch(updateToolId(tool));
+          dispatch(updateId(tool));
         },
         (xhr, status, error) => {
           // if error, then remove the added tool and show message error to user
-          dispatch(removeTool(tool));
+          dispatch(removeFromList(tool));
           if (xhr.responseText) {
             AppActions.alert(
-              //AlertType.ERROR,
-              "Erro de conexão com o servidor. Verifique sua conexão com a internet."
+              AlertType.ERROR,
+              "Connection error. Verify your internet connection."
             );
             dispatch(
               AppActions.alert(AlertType.ERROR, xhr.responseJSON.message)
@@ -105,7 +121,7 @@ export const saveTool = tool => {
             dispatch(
               AppActions.alert(
                 AlertType.ERROR,
-                "Erro de conexão com o servidor. Verifique sua conexão com a internet."
+                "Connection error. Verify your internet connection."
               )
             );
           }
@@ -115,16 +131,13 @@ export const saveTool = tool => {
   };
 };
 
-export const deleteTool = tool => {
+export const remove = tool => {
   return (dispatch, getState) => {
-    if (
-      !getState().AuthReducer.userToken ||
-      getState().AuthReducer.userToken === ""
-    ) {
+    if (!isAuthenticated(getState())) {
       requireLogin(dispatch);
     } else {
       // immediately removes the tool from the list
-      dispatch(removeTool(tool));
+      dispatch(removeFromList(tool));
       // send request to back end to persist
       ToolApi.remove(
         tool,
@@ -134,7 +147,7 @@ export const deleteTool = tool => {
         },
         (xhr, status, error) => {
           // if error, then undo deletion and show message error to user
-          dispatch(addTool(tool));
+          dispatch(addToList(tool));
           if (xhr.responseText) {
             dispatch(
               AppActions.alert(AlertType.ERROR, xhr.responseJSON.message)

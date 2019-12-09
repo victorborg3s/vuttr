@@ -42,7 +42,7 @@ public class ToolController {
 	@GetMapping("/paginated")
 	public @ResponseBody Page<Tool> getAllPaginated(@RequestParam(required = false) String tag,
 			@RequestParam(required = true) Integer page, @RequestParam(required = false) Integer size) {
-		int iSize = size <= 0 ? 10 : size;
+		int iSize = size == null || size <= 0 ? 10 : size;
 		PageRequest pageRequest = PageRequest.of(page, iSize, Sort.Direction.DESC, "id");
 		if (tag != null && !tag.isEmpty()) {
 			return toolDao.findByTag(pageRequest, tag);
