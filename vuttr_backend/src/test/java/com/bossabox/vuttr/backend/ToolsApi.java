@@ -147,7 +147,7 @@ class ToolsApi {
 	}
 
 	@Test
-	public void WhenDeleteToolWithValidCredentialShouldReturnNotContent() throws Exception {
+	public void WhenDeleteToolWithValidCredentialShouldReturnNoContent() throws Exception {
 		Tool toolSubject = toolsSubjects.get(0);
 		when(toolDaoMock.getOne(toolSubject.getId())).thenReturn(toolSubject);
 		when(tokenServiceMock.loadAuthentication(any(String.class))).thenReturn(auth);
@@ -182,5 +182,8 @@ class ToolsApi {
 				.andExpect(content().json("{'error': 'Absent or invalid request parameter.'}"))
 				.andDo(document("{class-name}/{method-name}"));
 	}
-
+	
+	public void WhenGetPaginatedToolsWithSizeEquals2AndPageEquals0ShouldReturnPaginatedToolWith2ElementsAtMax() throws Exception {
+		//TODO: implement test for paginated tools
+	}
 }

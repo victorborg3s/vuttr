@@ -6,6 +6,9 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -31,6 +34,23 @@ public class ToolController {
 	private ToolDao toolDao;
 
 	/**
+	 * Public end-point that return paginated {@link Tool}s
+	 * 
+	 * @param tag optional parameter used to filter the returned {@link Tool}s
+	 * @return a list of tools from database
+	 */
+	@GetMapping("/paginated")
+	public @ResponseBody Page<Tool> getAllPaginated(@RequestParam(required = false) String tag,
+			@RequestParam(required = true) Integer page, @RequestParam(required = false) Integer size) {
+		int iSize = size <= 0 ? 10 : size;
+		PageRequest pageRequest = PageRequest.of(page, iSize, Sort.Direction.DESC, "id");
+		if (tag != null && !tag.isEmpty()) {
+			return toolDao.findByTag(pageRequest, tag);
+		}
+		return toolDao.findAllByOrderByIdDesc(pageRequest);
+	}
+
+	/**
 	 * Public end-point that return {@link Tool}s
 	 * 
 	 * @param tag optional parameter used to filter the returned {@link Tool}s
@@ -48,7 +68,8 @@ public class ToolController {
 	 * Private end-point that allow the creation of a new {@link Tool}. Only
 	 * accessible with a valid {@link OAuth2Authentication}
 	 * 
-	 * @param auth token with user authentication that can be used to do some checking
+	 * @param auth token with user authentication that can be used to do some
+	 *             checking
 	 * @param tool the object to be inserted/updated
 	 * @return inserted/updated record
 	 */
@@ -63,7 +84,8 @@ public class ToolController {
 	 * Private end-point that allow the deletion of an existing {@link Tool}. Only
 	 * accessible with a valid {@link OAuth2Authentication}
 	 * 
-	 * @param auth token with user authentication that can be used to do some checking
+	 * @param auth           token with user authentication that can be used to do
+	 *                       some checking
 	 * @param toolDescriptor the object to be inserted/updated
 	 * @return inserted/updated record
 	 */
