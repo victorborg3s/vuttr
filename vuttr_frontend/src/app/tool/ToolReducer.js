@@ -13,14 +13,10 @@ const initialState = {
 };
 
 const applyFilter = (data, onlyTags, term) => {
-  console.log("data", data);
-  console.log("onlyTags", onlyTags);
-  console.log("term", term);
   let filteredData = data.filter((tool) => {
     if (onlyTags) return tool.tags.some( (tag) => tag.indexOf(term) > -1)
     else return tool.tags.some( (tag) => tag.indexOf(term) > -1) || (tool.title.indexOf(term) > -1) || (tool.description.indexOf(term) > -1);
   });
-  console.log("filteredData", filteredData);
   return filteredData;
 }
 
@@ -68,7 +64,6 @@ export default function AppReducer(state = initialState, action) {
       };
     }
     case ToolActions.ADD: {
-      console.log("Erro: passei por aqui!");
       return {
         ...state,
         isFormOpen: !state.isFormOpen,
