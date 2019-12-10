@@ -13,6 +13,7 @@ import {
   Nav,
   Row,
 } from "reactstrap";
+import { Helmet } from 'react-helmet';
 import { Login } from "./auth";
 import { ModalDialog } from './commons';
 import { Routes } from "../routes";
@@ -27,6 +28,10 @@ function App(props) {
 
   return (
     <BrowserRouter>
+      <Helmet>
+      <title>This is Where You Set The Page Title</title>
+  <meta name="description" content="This is an example of a meta description. This will often show up in search results, though many search engines generate their own." />
+      </Helmet>
       <ModalDialog {...props.dialogProps } onClose={props.actions.dialogHide} />
       <Container>
         <Row>
