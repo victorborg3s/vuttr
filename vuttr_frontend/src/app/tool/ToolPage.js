@@ -134,7 +134,7 @@ const ToolPage = props => {
                     </div>
                     <div className="float-right">
                       <Button
-                        onClick={() => props.actions.deleteTool(tool)}
+                        onClick={() => props.actions.remove(tool)}
                         color="link"
                       >
                         <span className="x">x</span>&nbsp;remove

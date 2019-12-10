@@ -29,8 +29,8 @@ function App(props) {
   return (
     <BrowserRouter>
       <Helmet>
-      <title>This is Where You Set The Page Title</title>
-  <meta name="description" content="This is an example of a meta description. This will often show up in search results, though many search engines generate their own." />
+      <title>VUTTR - Very Useful Tools To Remember!</title>
+      <meta name="description" content="Don't forget the Very Useful Tools you find. We'll help you to Remember!" />
       </Helmet>
       <ModalDialog {...props.dialogProps } onClose={props.actions.dialogHide} />
       <Container>
