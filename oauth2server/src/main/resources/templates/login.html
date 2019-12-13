@@ -1,5 +1,22 @@
 <html xmlns:th="https://www.thymeleaf.org">
 <body>
-	<div >sadsadsad</div>
+	<div>
+		<form action="/login" method="post">
+			<h2>Please sign in</h2>
+			<p>
+				<input name="username" type="text" placeholder="username" />
+			</p>
+			<p>
+				<input name="password" type="password" placeholder="password" />
+			</p>
+			<input type="submit" />
+		</form>
+		<div th:if="${param.error}" class="alert alert-error">
+			Invalid username and password.
+		</div>
+		<div th:if="${param.logout}" class="alert alert-success">
+			You have been logged out.
+		</div>
+	</div>
 </body>
 </html>

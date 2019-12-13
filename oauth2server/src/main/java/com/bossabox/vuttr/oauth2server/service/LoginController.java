@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@Controller
-@RequestMapping("/login")
+//@Controller
 public class LoginController {
 	
 	@Autowired
@@ -20,20 +19,18 @@ public class LoginController {
 	//@Autowired
 	//private OauthService oauthService;
 	
-	@GetMapping("/")
+	@GetMapping("/login")
 	public String loginPage() {
 		return "login";
 	}
 	
-	@PostMapping("/")
-	public void login() {
-		
-	}
-	
+	/*
 	@RequestMapping(value = "/doLogin", method = RequestMethod.POST)
 	public String doLogin(@RequestParam("username") String username, @RequestParam("password") String password,	HttpServletRequest request) {
-		return password;
-		
+		System.out.println("username: " + username);
+		System.out.println("password: " + password);
+		return "";
 	}
+	*/
 	
 }
