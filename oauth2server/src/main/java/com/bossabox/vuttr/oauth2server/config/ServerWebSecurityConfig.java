@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -40,14 +39,13 @@ public class ServerWebSecurityConfig extends WebSecurityConfigurerAdapter {
 		UrlBasedCorsConfigurationSource corsSource = new UrlBasedCorsConfigurationSource();
 		corsSource.registerCorsConfiguration("/**", configuration);
 
-		// TODO https://docs.spring.io/spring-security/site/docs/5.0.7.RELEASE/reference/html/oauth2login-advanced.html
+		// https://docs.spring.io/spring-security/site/docs/5.0.7.RELEASE/reference/html/oauth2login-advanced.html
 		http.cors().configurationSource(corsSource)
 			.and().authorizeRequests()
 				.antMatchers("/error").permitAll()
 				.antMatchers("/oauth/authorize").authenticated()
 				.anyRequest().authenticated()
 			.and().formLogin().loginPage("/login").permitAll()
-//			.and().oauth2Login().authorizationEndpoint().baseUri("/oauth/authorize").and()
 			.and().logout().permitAll()
 			.and().httpBasic()
 		;
