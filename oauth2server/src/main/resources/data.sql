@@ -11,10 +11,9 @@ insert into oauth_client_details(
 	additional_information,
 	autoapprove) 
 select * from (
-	select 'oauth2-jwt-client', 'resource-server-rest-api', '$2a$08$qvrzQZ7jJ7oy2p/msL4M0.l83Cd0jNsX6AJUitbgRXGzge4j035ha',
-		'read', 'password,authorization_code,refresh_token,client_credentials,implicit', 
-		'http://0.0.0.0:8080/oauth_callback', 'USER', 
-		10800, 2592000, '{}', 0) x 
+	select 'vuttr-web', 'vuttr-rest-api', '$2a$08$qvrzQZ7jJ7oy2p/msL4M0.l83Cd0jNsX6AJUitbgRXGzge4j035ha',
+		'vuttr_tool_write', 'password,authorization_code,refresh_token,client_credentials,implicit', 
+		'http://0.0.0.0:8080/oauth_callback', 'USER', 10800, 2592000, '{}', 0) x 
 	where not exists(select * from oauth_client_details);
 
 insert into authority(name) select * from (

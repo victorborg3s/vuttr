@@ -21,11 +21,8 @@ export default function Routes(props) {
     <Switch>
       <Route path={ERoute.HOME} exact={true} component={ToolPage} />
       <Route path={ERoute.TOOL_PAGE} exact={true} component={ToolPage} />
-      <Route
-        path={ERoute.OAUTH_CALLBACK}
-        exact={true}
-        component={LoginCallback}
-      />
+      <Route path={ERoute.OAUTH_CALLBACK} exact={true} component={LoginCallback} />
+      <Route component={ToolPage} />
     </Switch>
   );
 }

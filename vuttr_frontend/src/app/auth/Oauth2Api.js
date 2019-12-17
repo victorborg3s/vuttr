@@ -3,11 +3,11 @@ import * as Config from '../../configuration';
 
 export function getToken(success, error) {
     jQuery.ajax({
-        url: `${Config.AUTH_AUTHORIZATION_URL}?scope=read&response_type=token&client_id=oauth2-jwt-client`,
+        url: `${Config.AUTH_AUTHORIZATION_URL}?scope=read&response_type=token&client_id=vuttr-web`,
         type: 'POST',
         data: {
             response_type: 'token',
-            client_id: 'oauth2-jwt-client',
+            client_id: 'vuttr-web',
             client_secret: 'admin1234'
         },
         dataType: "json",

@@ -1,7 +1,7 @@
 <html xmlns:th="https://www.thymeleaf.org">
 <body>
 	<div>
-		<h2>Do you authorize "blah" to access your protected resources?</h2>
+		<h2>Do you authorize <span th:text="${'[' + clientId + ']'}">[clientId]</span> to have <span th:text="${'[' + scope + ']'}">[scope]</span> permission(s) for your resources in <span th:text="${'[' + resources + ']'}">[resources]</span>?</h2>
 		<form id="confirmationForm" name="confirmationForm" th:action="@{/oauth/authorize}" method="post">
 			<input name="user_oauth_approval" value="true" type="hidden" />
 			<input name="authorize" value="Authorize" type="submit" />

@@ -18,9 +18,9 @@ export const setWhereToGoAfterOauthCallback = whereTo => ({
 const _openLoginPage = async () => {
   const qParams = [
     `redirect_uri=http://${window.location.host}${ERoute.OAUTH_CALLBACK}`,
-    `scope=read`,
+    `scope=vuttr_tool_write`,
     `response_type=token`,
-    `client_id=oauth2-jwt-client`
+    `client_id=vuttr-web`
   ].join("&");
 
   try {
