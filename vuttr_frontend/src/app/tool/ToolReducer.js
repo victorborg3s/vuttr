@@ -64,25 +64,32 @@ export default function AppReducer(state = initialState, action) {
       };
     }
     case ToolActions.ADD: {
+      let newData = [action.tool, ...state.data];
       return {
         ...state,
         isFormOpen: !state.isFormOpen,
-        data: [action.tool, ...state.data],
+        data: newData,
+        filteredData: applyFilter(newData, state.searchOnlyTags, state.searchTerm),
       };
     }
     case ToolActions.UPDATE_ID: {
-      let tool = state.data.find(t => t.title === action.tool.title);
-      tool.id = action.tool.id;
+      let index = state.data.findIndex(t => t.title === action.tool.title); 
+      let tool = state.data[index];
+      tool = {...tool, id: action.tool.id};
+      let newData = [...state.data];
+      newData[index] = tool;
       return {
         ...state,
-        isFormOpen: !state.isFormOpen
+        data: newData,
+        filteredData: applyFilter(newData, state.searchOnlyTags, state.searchTerm),
       };
     }
     case ToolActions.DELETE: {
-      let newToolList = state.data.filter(t => t.id !== action.tool.id);
+      let newData = state.data.filter(t => t.id !== action.tool.id);
       return {
         ...state,
-        data: newToolList
+        data: newData,
+        filteredData: applyFilter(newData, state.searchOnlyTags, state.searchTerm),
       };
     }
     case ToolActions.TOGGLE_FORM: {
