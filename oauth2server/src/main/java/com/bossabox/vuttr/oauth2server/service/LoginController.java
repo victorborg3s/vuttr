@@ -1,5 +1,7 @@
 package com.bossabox.vuttr.oauth2server.service;
 
+import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
+@SessionAttributes("authorizationRequest")
 public class LoginController {
 	
 	@Autowired
@@ -22,6 +27,11 @@ public class LoginController {
 	@GetMapping("/login")
 	public String loginPage() {
 		return "login";
+	}
+	
+	@RequestMapping("/oauth/custom_confirm_access")
+	public ModelAndView authorizePage() {
+		return new ModelAndView("oauth_authorize", new HashMap<String, Object>());
 	}
 	
 	/*

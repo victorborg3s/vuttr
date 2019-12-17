@@ -1,5 +1,6 @@
 package com.bossabox.vuttr.oauth2server.config;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
+import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
@@ -28,59 +30,75 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @Import(ServerWebSecurityConfig.class)
 public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-    @Autowired
-    @Qualifier("dataSource")
-    private DataSource dataSource;
+	@Autowired
+	private AuthorizationEndpoint authorizationEndpoint;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
-    
-    @Autowired
-    private PasswordEncoder oauthClientPasswordEncoder;
+	/* "[..]Sometimes based on configuration and customization the aforementioned method may not work, 
+	 * if Framew‌orkEndpointHandlerMa‌pping from Spring Security OAuth package has higher order than 
+	 * RequestMappingHandlerMapping of your application [..]"
+	 * https://stackoverflow.com/questions/29345508/spring-oauth2-custom-oauth-approval-page-at-oauth-authorize
+	 */
+	@PostConstruct
+	public void init() {
+		authorizationEndpoint.setUserApprovalPage("forward:/oauth/custom_confirm_access");
+		authorizationEndpoint.setErrorPage("forward:/oauth/custom_error");
+	}
 
-    @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.tokenStore(tokenStore()).accessTokenConverter(accessTokenConverter()).authenticationManager(authenticationManager).userDetailsService(userDetailsService);
-    }
+	@Autowired
+	@Qualifier("dataSource")
+	private DataSource dataSource;
 
-    @Override
-    public void configure(AuthorizationServerSecurityConfigurer oauthServer) {
-        oauthServer.tokenKeyAccess("permitAll()").checkTokenAccess("permitAll()").passwordEncoder(oauthClientPasswordEncoder);
-    }
+	@Autowired
+	private UserDetailsService userDetailsService;
 
-    @Bean
-    public TokenStore tokenStore() {
-        return new JwtTokenStore(accessTokenConverter());
-    }
+	@Autowired
+	private PasswordEncoder oauthClientPasswordEncoder;
 
-    @Override
-    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        JdbcClientDetailsService jdbcClientDetailsService = new JdbcClientDetailsService(dataSource);
-        clients.withClientDetails(jdbcClientDetailsService);
-    }
+	@Override
+	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		endpoints.tokenStore(tokenStore()).accessTokenConverter(accessTokenConverter())
+				.authenticationManager(authenticationManager).userDetailsService(userDetailsService);
+	}
 
-    @Bean
-    public JwtAccessTokenConverter accessTokenConverter() {
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey("123");
-        return converter;
-    }
+	@Override
+	public void configure(AuthorizationServerSecurityConfigurer oauthServer) {
+		oauthServer.tokenKeyAccess("permitAll()").checkTokenAccess("permitAll()")
+				.passwordEncoder(oauthClientPasswordEncoder);
+	}
 
-    @Bean
-    @Primary
-    public DefaultTokenServices tokenServices() {
-        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        defaultTokenServices.setTokenStore(tokenStore());
-        defaultTokenServices.setSupportRefreshToken(true);
-        return defaultTokenServices;
-    }
+	@Bean
+	public TokenStore tokenStore() {
+		return new JwtTokenStore(accessTokenConverter());
+	}
 
-    @Bean
-    public PasswordEncoder userPasswordEncoder() {
-        return new BCryptPasswordEncoder(4);
-    }
+	@Override
+	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+		JdbcClientDetailsService jdbcClientDetailsService = new JdbcClientDetailsService(dataSource);
+		clients.withClientDetails(jdbcClientDetailsService);
+	}
+
+	@Bean
+	public JwtAccessTokenConverter accessTokenConverter() {
+		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+		converter.setSigningKey("123");
+		return converter;
+	}
+
+	@Bean
+	@Primary
+	public DefaultTokenServices tokenServices() {
+		DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+		defaultTokenServices.setTokenStore(tokenStore());
+		defaultTokenServices.setSupportRefreshToken(true);
+		return defaultTokenServices;
+	}
+
+	@Bean
+	public PasswordEncoder userPasswordEncoder() {
+		return new BCryptPasswordEncoder(4);
+	}
 
 }

@@ -43,10 +43,11 @@ public class ServerWebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// TODO https://docs.spring.io/spring-security/site/docs/5.0.7.RELEASE/reference/html/oauth2login-advanced.html
 		http.cors().configurationSource(corsSource)
 			.and().authorizeRequests()
-//				.antMatchers(HttpMethod.POST, "/login").permitAll()
 				.antMatchers("/error").permitAll()
+				.antMatchers("/oauth/authorize").authenticated()
 				.anyRequest().authenticated()
 			.and().formLogin().loginPage("/login").permitAll()
+//			.and().oauth2Login().authorizationEndpoint().baseUri("/oauth/authorize").and()
 			.and().logout().permitAll()
 			.and().httpBasic()
 		;

@@ -1,0 +1,15 @@
+<html xmlns:th="https://www.thymeleaf.org">
+<body>
+	<div>
+		<h2>Do you authorize "blah" to access your protected resources?</h2>
+		<form id="confirmationForm" name="confirmationForm" th:action="@{/oauth/authorize}" method="post">
+			<input name="user_oauth_approval" value="true" type="hidden" />
+			<input name="authorize" value="Authorize" type="submit" />
+		</form>
+		<form id="denialForm" name="denialForm" th:action="@{/oauth/authorize}" method="post">
+			<input name="user_oauth_approval" value="false" type="hidden" />
+			<input name="deny" value="Deny" type="submit" />
+		</form>
+	</div>
+</body>
+</html>
