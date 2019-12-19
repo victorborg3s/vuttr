@@ -21,26 +21,35 @@ import * as ToolActions from "./ToolActions";
 import { DataStatus } from "../../utils";
 import "./ToolPage.css";
 
-const ToolPage = props => {
-  window.onscroll = () => {
-    if (
-      props.dataHasMore &&
-      props.dataStatus === DataStatus.LOADED &&
-      window.innerHeight + document.documentElement.scrollTop >=
-        0.7 * document.documentElement.offsetHeight
-    ) {
-      props.actions.fetch(
-        props.dataPage,
-        false
-      );
-    }
-  };
-
+const ToolPage = ({
+  dataStatus,
+  dataHasMore,
+  actions,
+  dataPage,
+  filteredData,
+  searchOnlyTags,
+  searchTerm,
+  isFormOpen
+}) => {
   useEffect(() => {
-    if (props.dataStatus === DataStatus.INITIAL_LOAD) {
-      props.actions.fetch(0);
+    window.onscroll = () => {
+      if (
+        dataHasMore &&
+        dataStatus === DataStatus.LOADED &&
+        window.innerHeight + document.documentElement.scrollTop >=
+          0.7 * document.documentElement.offsetHeight
+      ) {
+        actions.fetch(dataPage, false);
+      }
+    };
+    return () => {
+      window.onscroll = undefined;
     }
   });
+
+  useEffect(() => {
+    actions.fetch(0);
+  }, [actions]);
 
   const [tool, setTool] = useState({
     title: "",
@@ -50,10 +59,10 @@ const ToolPage = props => {
   });
 
   const toggleSearchOnlyTags = () => {
-    props.actions.applyFilter(!props.searchOnlyTags, props.searchTerm);
+    actions.applyFilter(!searchOnlyTags, searchTerm);
   };
-  const onSearchTermChange = (event) => {
-    props.actions.applyFilter(props.searchOnlyTags, event.target.value);
+  const onSearchTermChange = event => {
+    actions.applyFilter(searchOnlyTags, event.target.value);
   };
 
   const toolInputChange = event => {
@@ -68,18 +77,18 @@ const ToolPage = props => {
     let newTool = {
       ...tool,
       /*
-        if it's empty, react will launch a warning:
+        if id is empty, react will launch a warning:
         "Each child in a list should have a unique "key" prop."
       */
       id: _.uniqueId(),
       tags: tool.tags.split(" ")
     };
-    props.actions.save(newTool);
+    actions.save(newTool);
     setTool({ title: "", link: "", description: "", tags: "" });
   };
 
   let loading = "";
-  if (props.dataStatus !== DataStatus.LOADED) {
+  if (dataStatus !== DataStatus.LOADED) {
     loading = (
       <Row>
         <Col style={{ textAlign: "center" }}>
@@ -92,25 +101,37 @@ const ToolPage = props => {
   return (
     <>
       <ToolModalForm
-        isOpen={props.isFormOpen}
-        toggle={props.actions.toggleForm}
+        isOpen={isFormOpen}
+        toggle={actions.toggleForm}
         tool={tool}
         inputChangeHandler={toolInputChange}
         onSave={toolSave}
-        onCancel={props.actions.toggleForm}
+        onCancel={actions.toggleForm}
       />
       <Row>
         <Col>
-          <Input type="search" name="search" id="search" placeholder="search" value={props.searchTerm} onChange={onSearchTermChange} />
+          <Input
+            type="search"
+            name="search"
+            id="search"
+            placeholder="search"
+            value={searchTerm}
+            onChange={onSearchTermChange}
+          />
         </Col>
         <Col className="vcenter">
           <Label check>
-            <Input type="checkbox" value={props.searchOnlyTags} onChange={toggleSearchOnlyTags} /> search in tags only
+            <Input
+              type="checkbox"
+              value={searchOnlyTags}
+              onChange={toggleSearchOnlyTags}
+            />{" "}
+            search in tags only
           </Label>
         </Col>
         <Col className="vcenter">
           <div className="float-right">
-            <Button onClick={props.actions.toggleForm} color="primary">
+            <Button onClick={actions.toggleForm} color="primary">
               <MdAdd color="white" />
               add
             </Button>
@@ -120,7 +141,7 @@ const ToolPage = props => {
       <Row>
         <Col>
           <TransitionGroup className="todo-list">
-            {props.filteredData.map(tool => (
+            {filteredData.map(tool => (
               <CSSTransition key={tool.id} timeout={500} classNames="item">
                 <Card className="tool-card">
                   <CardHeader>
@@ -133,10 +154,7 @@ const ToolPage = props => {
                       </Button>
                     </div>
                     <div className="float-right">
-                      <Button
-                        onClick={() => props.actions.remove(tool)}
-                        color="link"
-                      >
+                      <Button onClick={() => actions.remove(tool)} color="link">
                         <span className="x">x</span>&nbsp;remove
                       </Button>
                     </div>
