@@ -75,7 +75,7 @@ public class ToolController {
 	 */
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	@PreAuthorize("#oauth2.hasAnyScope('read')")
+	@PreAuthorize("#oauth2.hasAnyScope('vuttr_tool_write')")
 	public @ResponseBody Tool save(@Valid @RequestBody Tool tool) {
 		return toolDao.save(tool);
 	}
@@ -91,7 +91,7 @@ public class ToolController {
 	 */
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@PreAuthorize("#oauth2.hasAnyScope('read')")
+	@PreAuthorize("#oauth2.hasAnyScope('vuttr_tool_write')")
 	public @ResponseBody void delete(@PathVariable Integer id) {
 		if (id != null && id > 0) {
 			Tool tool = toolDao.getOne(id);

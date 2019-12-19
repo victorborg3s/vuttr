@@ -18,7 +18,6 @@ export function list(page, success, error) {
 }
 
 export function create(entity, jwToken, success, error) {
-    console.log(`${Config.API_URL}/${ENDPOINT}`);
     jQuery.ajax({
         url: `${Config.API_URL}/${ENDPOINT}`,
         dataType: "json",

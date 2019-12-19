@@ -20,7 +20,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 
 	@Override
 	public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-		resources.resourceId("resource-server-rest-api").authenticationManager(authenticationManagerBean())
+		resources.resourceId("vuttr-rest-api").authenticationManager(authenticationManagerBean())
 				.tokenExtractor(new CustomTokenExtractor());
 	}
 

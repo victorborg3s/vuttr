@@ -56,7 +56,6 @@ const requireLogin = dispatch => {
 
 export const toggleForm = () => {
   return (dispatch, getState) => {
-    console.log(isAuthenticated);
     if (isAuthenticated(getState())) {
       dispatch(effectiveToggleForm());
     } else {
@@ -104,7 +103,7 @@ export const save = tool => {
         getUserToken(getState()),
         (result, status, xhr) => {
           // if success, update id
-          dispatch(updateId(tool));
+          dispatch(updateId(result));
         },
         (xhr, status, error) => {
           // if error, then remove the added tool and show message error to user
