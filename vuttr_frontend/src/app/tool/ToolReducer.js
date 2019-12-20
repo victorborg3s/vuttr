@@ -9,7 +9,20 @@ const initialState = {
   filteredData: [],
   searchTerm: "",
   searchOnlyTags: false,
-  isFormOpen: false
+  isFormOpen: false,
+  tool: {
+    title: "",
+    link: "",
+    description: "",
+    tags: ""
+  },
+  fieldsValidity: {
+    title: "",
+    link: "",
+    description: "",
+    tags: "",
+    isOk: true
+  }
 };
 
 const applyFilter = (data, onlyTags, term) => {
@@ -88,7 +101,7 @@ export default function AppReducer(state = initialState, action) {
           newData,
           state.searchOnlyTags,
           state.searchTerm
-        )
+        ),
       };
     }
     case ToolActions.UPDATE_ID: {
@@ -122,7 +135,35 @@ export default function AppReducer(state = initialState, action) {
     case ToolActions.TOGGLE_FORM: {
       return {
         ...state,
-        isFormOpen: !state.isFormOpen
+        isFormOpen: !state.isFormOpen,
+        fieldsValidity: {
+          title: "",
+          link: "",
+          description: "",
+          tags: "",
+          isOk: true
+        },
+        tool: {
+          title: "",
+          link: "",
+          description: "",
+          tags: ""
+        },
+      };
+    }
+    case ToolActions.UPDATE_FORM_VALIDITY: {
+      return {
+        ...state,
+        fieldsValidity: action.fieldsValidity
+      };
+    }
+    case ToolActions.FORM_FIELD_CHANGE: {
+      return {
+        ...state,
+        tool: {
+          ...state.tool,
+          [action.event.target.name]: action.event.target.value
+        }
       };
     }
     default:

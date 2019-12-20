@@ -13,44 +13,55 @@ import {
 } from "reactstrap";
 import MdAdd from "react-ionicons/lib/MdAdd";
 
-const ToolModalForm = props => {
+const ToolModalForm = ({
+  isOpen,
+  toggle,
+  inputChangeHandler,
+  tool,
+  onSave,
+  onCancel,
+  fieldsValidity
+}) => {
   return (
-    <Modal isOpen={props.isOpen} toggle={props.toggle}>
-      <ModalHeader toggle={props.toggle}>
+    <Modal isOpen={isOpen} toggle={toggle}>
+      <ModalHeader toggle={toggle}>
         <MdAdd color="black" />
         Add new tool
       </ModalHeader>
       <ModalBody>
         <Form>
           <FormGroup>
-            <Label for="toolTitle">Tool Name</Label>
+            <Label for="toolTitle">Name</Label>
             <Input
               type="text"
               name="title"
               id="toolTitle"
-              onChange={props.inputChangeHandler}
-              value={props.tool.title}
+              onChange={inputChangeHandler}
+              value={tool.title}
             />
+            <FormText color="danger">{fieldsValidity.title}</FormText>
           </FormGroup>
           <FormGroup>
-            <Label for="toolLink">Tool Link</Label>
+            <Label for="toolLink">Link</Label>
             <Input
               type="text"
               name="link"
               id="toolLink"
-              onChange={props.inputChangeHandler}
-              value={props.tool.link}
+              onChange={inputChangeHandler}
+              value={tool.link}
             />
+            <FormText color="danger">{fieldsValidity.link}</FormText>
           </FormGroup>
           <FormGroup>
-            <Label for="toolDescription">Tool Description</Label>
+            <Label for="toolDescription">Description</Label>
             <Input
               type="textarea"
               name="description"
               id="toolDescription"
-              onChange={props.inputChangeHandler}
-              value={props.tool.description}
+              onChange={inputChangeHandler}
+              value={tool.description}
             />
+            <FormText color="danger">{fieldsValidity.description}</FormText>
           </FormGroup>
           <FormGroup>
             <Label for="toolTags">Tags</Label>
@@ -58,9 +69,10 @@ const ToolModalForm = props => {
               type="text"
               name="tags"
               id="toolTags"
-              onChange={props.inputChangeHandler}
-              value={props.tool.tags}
+              onChange={inputChangeHandler}
+              value={tool.tags}
             />
+            <FormText color="danger">{fieldsValidity.tags}</FormText>
             <FormText color="muted">
               Put any number of tags separated by one white space between each
               one
@@ -69,10 +81,10 @@ const ToolModalForm = props => {
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button color="primary" onClick={props.onSave}>
+        <Button color="primary" onClick={onSave}>
           Save
         </Button>{" "}
-        <Button color="secondary" onClick={props.onCancel}>
+        <Button color="secondary" onClick={onCancel}>
           Cancel
         </Button>
       </ModalFooter>

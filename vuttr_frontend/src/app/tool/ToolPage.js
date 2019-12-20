@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { Col, Row, Spinner } from "reactstrap";
-import * as _ from "lodash/core";
 import ToolModalForm from "./ToolModalForm";
 import ToolPageHeader from "./ToolPageHeader";
 import ToolList from "./ToolList";
@@ -18,7 +17,9 @@ const ToolPage = ({
   filteredData,
   searchOnlyTags,
   searchTerm,
-  isFormOpen
+  isFormOpen,
+  fieldsValidity,
+  tool
 }) => {
   useEffect(() => {
     window.onscroll = () => {
@@ -46,30 +47,6 @@ const ToolPage = ({
     }
   }, [actions, filteredData, dataPage, dataHasMore]);
 
-  const [tool, setTool] = useState({
-    title: "",
-    link: "",
-    description: "",
-    tags: ""
-  });
-
-  const toolSave = event => {
-    if (event) {
-      event.preventDefault();
-    }
-    let newTool = {
-      ...tool,
-      /*
-        if id is empty, react will launch a warning:
-        "Each child in a list should have a unique "key" prop."
-      */
-      id: _.uniqueId(),
-      tags: tool.tags.split(" ")
-    };
-    actions.save(newTool);
-    setTool({ title: "", link: "", description: "", tags: "" });
-  };
-
   let loading = "";
   if (dataStatus !== DataStatus.LOADED) {
     loading = (
@@ -87,14 +64,12 @@ const ToolPage = ({
         isOpen={isFormOpen}
         toggle={actions.toggleForm}
         tool={tool}
+        fieldsValidity={fieldsValidity}
         inputChangeHandler={event => {
           event.persist();
-          setTool(inputs => ({
-            ...inputs,
-            [event.target.name]: event.target.value
-          }));
+          actions.inputChangeHandler(event);
         }}
-        onSave={toolSave}
+        onSave={actions.save}
         onCancel={actions.toggleForm}
       />
       <ToolPageHeader
