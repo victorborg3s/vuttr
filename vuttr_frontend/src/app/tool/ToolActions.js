@@ -34,12 +34,6 @@ export const applyDataFilter = (searchOnlyTags, searchTerm) => ({
 export const applyFilter = (searchOnlyTags, searchTerm) => {
   return (dispatch, getState) => {
     dispatch(applyDataFilter(searchOnlyTags, searchTerm));
-    if (getState().ToolReducer.filteredData.length < 10) {
-      dispatch(fetch(
-        getState().ToolReducer.dataPage,
-        false
-      ));
-    }
   }
 };
 

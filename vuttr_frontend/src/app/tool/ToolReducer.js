@@ -13,12 +13,19 @@ const initialState = {
 };
 
 const applyFilter = (data, onlyTags, term) => {
-  let filteredData = data.filter((tool) => {
-    if (onlyTags) return tool.tags.some( (tag) => tag.indexOf(term) > -1)
-    else return tool.tags.some( (tag) => tag.indexOf(term) > -1) || (tool.title.indexOf(term) > -1) || (tool.description.indexOf(term) > -1);
+  const lowerTerm = term.toLowerCase();
+  let filteredData = data.filter(tool => {
+    if (onlyTags)
+      return tool.tags.some(tag => tag.toLowerCase().indexOf(lowerTerm) > -1);
+    else
+      return (
+        tool.tags.some(tag => tag.toLowerCase().indexOf(lowerTerm) > -1) ||
+        tool.title.toLowerCase().indexOf(lowerTerm) > -1 ||
+        tool.description.toLowerCase().indexOf(lowerTerm) > -1
+      );
   });
   return filteredData;
-}
+};
 
 export default function AppReducer(state = initialState, action) {
   switch (action.type) {
@@ -42,7 +49,11 @@ export default function AppReducer(state = initialState, action) {
         ...state,
         dataStatus: DataStatus.LOADED,
         data: newData,
-        filteredData: applyFilter(newData, state.searchOnlyTags, state.searchTerm),
+        filteredData: applyFilter(
+          newData,
+          state.searchOnlyTags,
+          state.searchTerm
+        ),
         dataPage: newDataPage,
         dataHasMore:
           action.paginatedResult &&
@@ -52,7 +63,7 @@ export default function AppReducer(state = initialState, action) {
     }
     case ToolActions.DATA_ERROR: {
       return {
-        ...state,
+        ...state
       };
     }
     case ToolActions.DATA_FILTER: {
@@ -60,7 +71,11 @@ export default function AppReducer(state = initialState, action) {
         ...state,
         searchTerm: action.searchTerm,
         searchOnlyTags: action.searchOnlyTags,
-        filteredData: applyFilter(state.data, action.searchOnlyTags, action.searchTerm)
+        filteredData: applyFilter(
+          state.data,
+          action.searchOnlyTags,
+          action.searchTerm
+        )
       };
     }
     case ToolActions.ADD: {
@@ -69,19 +84,27 @@ export default function AppReducer(state = initialState, action) {
         ...state,
         isFormOpen: !state.isFormOpen,
         data: newData,
-        filteredData: applyFilter(newData, state.searchOnlyTags, state.searchTerm),
+        filteredData: applyFilter(
+          newData,
+          state.searchOnlyTags,
+          state.searchTerm
+        )
       };
     }
     case ToolActions.UPDATE_ID: {
-      let index = state.data.findIndex(t => t.title === action.tool.title); 
+      let index = state.data.findIndex(t => t.title === action.tool.title);
       let tool = state.data[index];
-      tool = {...tool, id: action.tool.id};
+      tool = { ...tool, id: action.tool.id };
       let newData = [...state.data];
       newData[index] = tool;
       return {
         ...state,
         data: newData,
-        filteredData: applyFilter(newData, state.searchOnlyTags, state.searchTerm),
+        filteredData: applyFilter(
+          newData,
+          state.searchOnlyTags,
+          state.searchTerm
+        )
       };
     }
     case ToolActions.DELETE: {
@@ -89,7 +112,11 @@ export default function AppReducer(state = initialState, action) {
       return {
         ...state,
         data: newData,
-        filteredData: applyFilter(newData, state.searchOnlyTags, state.searchTerm),
+        filteredData: applyFilter(
+          newData,
+          state.searchOnlyTags,
+          state.searchTerm
+        )
       };
     }
     case ToolActions.TOGGLE_FORM: {

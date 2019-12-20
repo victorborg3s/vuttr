@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import MdAdd from "react-ionicons/lib/MdAdd";
-import {
-  Col,
-  Row,
-  Input,
-  Label,
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardText,
-  Spinner
-} from "reactstrap";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { Col, Row, Spinner } from "reactstrap";
 import * as _ from "lodash/core";
 import ToolModalForm from "./ToolModalForm";
+import ToolPageHeader from "./ToolPageHeader";
+import ToolList from "./ToolList";
 import * as ToolActions from "./ToolActions";
 import { DataStatus } from "../../utils";
 import "./ToolPage.css";
@@ -44,12 +33,18 @@ const ToolPage = ({
     };
     return () => {
       window.onscroll = undefined;
-    }
+    };
   });
 
   useEffect(() => {
     actions.fetch(0);
   }, [actions]);
+
+  useEffect(() => {
+    if (filteredData && filteredData.length < 15 && dataHasMore) {
+      actions.fetch(dataPage + 1, false);
+    }
+  }, [actions, filteredData, dataPage, dataHasMore]);
 
   const [tool, setTool] = useState({
     title: "",
@@ -57,18 +52,6 @@ const ToolPage = ({
     description: "",
     tags: ""
   });
-
-  const toggleSearchOnlyTags = () => {
-    actions.applyFilter(!searchOnlyTags, searchTerm);
-  };
-  const onSearchTermChange = event => {
-    actions.applyFilter(searchOnlyTags, event.target.value);
-  };
-
-  const toolInputChange = event => {
-    event.persist();
-    setTool(inputs => ({ ...inputs, [event.target.name]: event.target.value }));
-  };
 
   const toolSave = event => {
     if (event) {
@@ -104,79 +87,28 @@ const ToolPage = ({
         isOpen={isFormOpen}
         toggle={actions.toggleForm}
         tool={tool}
-        inputChangeHandler={toolInputChange}
+        inputChangeHandler={event => {
+          event.persist();
+          setTool(inputs => ({
+            ...inputs,
+            [event.target.name]: event.target.value
+          }));
+        }}
         onSave={toolSave}
         onCancel={actions.toggleForm}
       />
-      <Row>
-        <Col>
-          <Input
-            type="search"
-            name="search"
-            id="search"
-            placeholder="search"
-            value={searchTerm}
-            onChange={onSearchTermChange}
-          />
-        </Col>
-        <Col className="vcenter">
-          <Label check>
-            <Input
-              type="checkbox"
-              value={searchOnlyTags}
-              onChange={toggleSearchOnlyTags}
-            />{" "}
-            search in tags only
-          </Label>
-        </Col>
-        <Col className="vcenter">
-          <div className="float-right">
-            <Button onClick={actions.toggleForm} color="primary">
-              <MdAdd color="white" />
-              add
-            </Button>
-          </div>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <TransitionGroup className="todo-list">
-            {filteredData.map(tool => (
-              <CSSTransition key={tool.id} timeout={500} classNames="item">
-                <Card className="tool-card">
-                  <CardHeader>
-                    <div className="float-left">
-                      <Button
-                        color="link"
-                        onClick={() => window.open(tool.link, "_blank")}
-                      >
-                        {tool.title}
-                      </Button>
-                    </div>
-                    <div className="float-right">
-                      <Button onClick={() => actions.remove(tool)} color="link">
-                        <span className="x">x</span>&nbsp;remove
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardBody>
-                    <CardText>
-                      <span>{tool.description}</span>
-                      <br />
-                      <br />
-                      {tool.tags.map(tag => (
-                        <span key={_.uniqueId("tag_")} className="tag">
-                          {"#" + tag}&nbsp;
-                        </span>
-                      ))}
-                    </CardText>
-                  </CardBody>
-                </Card>
-              </CSSTransition>
-            ))}
-          </TransitionGroup>
-        </Col>
-      </Row>
+      <ToolPageHeader
+        onAddClick={actions.toggleForm}
+        searchTerm={searchTerm}
+        searchOnlyTags={searchOnlyTags}
+        toggleSearchOnlyTags={() =>
+          actions.applyFilter(!searchOnlyTags, searchTerm)
+        }
+        onSearchTermChange={event =>
+          actions.applyFilter(searchOnlyTags, event.target.value)
+        }
+      />
+      <ToolList data={filteredData} onRemove={actions.remove} />
       {loading}
     </>
   );
