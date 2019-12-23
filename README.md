@@ -1,10 +1,13 @@
 # Very Useful Tools to Remember (VUTTR)
 
-This project aims attend to requirements in order to join [BossaBox](https://bossabox.com/)'s community. It's a full stack project with React based front-end and Spring Boot back-end.
+This is a full stack project for a conceptual test involving the following technologies: 
+- React.js front-end;
+- Spring Boot back-end;
+- Oauth2 (Spring Security).
 
 ## Features
 
-This is a simple application that manages useful tools with its respective names, links, descriptions and tags. Furthermore, it also implements a Oauth2 Authentication that protects some application features.
+This is a simple application that manages useful tools with respective names, links, descriptions and tags. Furthermore, it also implements a Oauth2 Authentication that protects some application features.
 
 - Sign in/Sign out with OAuth2 authorization code;
 - Tools' listing and filtering;
