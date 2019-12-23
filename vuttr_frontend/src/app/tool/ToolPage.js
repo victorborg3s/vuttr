@@ -21,6 +21,10 @@ const ToolPage = ({
   fieldsValidity,
   tool
 }) => {
+  /**
+   * This useEffect will apply a infinite scroll role on the page. So, when the user reach near
+   * page ending, more data will be fetched.
+   */
   useEffect(() => {
     window.onscroll = () => {
       if (
@@ -35,12 +39,18 @@ const ToolPage = ({
     return () => {
       window.onscroll = undefined;
     };
-  });
+  }, [actions, dataHasMore, dataPage, dataStatus]);
 
+  /**
+   * This useEffect will call only once. This because its dependency ([actions]) never change.
+   */
   useEffect(() => {
     actions.fetch(0);
   }, [actions]);
 
+  /**
+   * This useEffect will apply a rule to load more data if the list has less than 15 records.
+   */
   useEffect(() => {
     if (filteredData && filteredData.length < 15 && dataHasMore) {
       actions.fetch(dataPage + 1, false);
@@ -76,14 +86,19 @@ const ToolPage = ({
         onAddClick={actions.toggleForm}
         searchTerm={searchTerm}
         searchOnlyTags={searchOnlyTags}
-        toggleSearchOnlyTags={() =>
-          actions.applyFilter(!searchOnlyTags, searchTerm)
+        toggleSearchOnlyTags={event => 
+          actions.applyFilter(event.target.checked, searchTerm)
         }
         onSearchTermChange={event =>
           actions.applyFilter(searchOnlyTags, event.target.value)
         }
       />
-      <ToolList data={filteredData} onRemove={actions.remove} />
+      <ToolList
+        data={filteredData}
+        onRemove={actions.remove}
+        searchTerm={searchTerm}
+        searchOnlyTags={searchOnlyTags}
+      />
       {loading}
     </>
   );

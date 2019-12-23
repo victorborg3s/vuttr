@@ -6,15 +6,13 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardText,
+  CardText
 } from "reactstrap";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import * as _ from "lodash/core";
+import { HighlightedSpan } from '../commons';
 
-const ToolList = ({
-  data,
-  onRemove,
-}) => {
+const ToolList = ({ data, onRemove, searchTerm, searchOnlyTags }) => {
   return (
     <Row>
       <Col>
@@ -28,7 +26,10 @@ const ToolList = ({
                       color="link"
                       onClick={() => window.open(tool.link, "_blank")}
                     >
-                      {tool.title}
+                      {searchOnlyTags
+                        ? tool.title
+                        : <HighlightedSpan text={tool.title} highlight={searchTerm} />
+                      }
                     </Button>
                   </div>
                   <div className="float-right">
@@ -39,14 +40,23 @@ const ToolList = ({
                 </CardHeader>
                 <CardBody>
                   <CardText>
-                    <span>{tool.description}</span>
+                    {searchOnlyTags
+                        ? tool.description
+                        : <HighlightedSpan text={tool.description} highlight={searchTerm} />
+                      }
                     <br />
                     <br />
-                    {tool.tags.map(tag => (
-                      <span key={_.uniqueId("tag_")} className="tag">
-                        {"#" + tag}&nbsp;
-                      </span>
-                    ))}
+                    {tool.tags.map(tag => {
+                      if (tag.toLowerCase().includes(searchTerm.toLowerCase())) {
+                        return <HighlightedSpan key={_.uniqueId("tag_")} text={"#"+tag} highlight={searchTerm} />
+                      } else {
+                        return (
+                          <span key={_.uniqueId("tag_")}>
+                            {"#" + tag}&nbsp;
+                          </span>
+                        );
+                      }
+                    })}
                   </CardText>
                 </CardBody>
               </Card>
