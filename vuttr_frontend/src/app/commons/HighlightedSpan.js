@@ -5,6 +5,7 @@ const HighlightedSpan = ({text, highlight}) => {
   const splited = text.split(RegExp(highlight, "i"));
   const occurr = text.match(RegExp(highlight, "gi"));
   let count = -1;
+  if (!highlight || highlight === '') return <span>{text + " "}</span>
   return splited.map((span, index) => {
     if (index === 0)
       return (
