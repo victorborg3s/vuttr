@@ -1,21 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { Button } from "reactstrap";
 import MdPerson from "react-ionicons/lib/MdPerson";
 import * as AuthActions from "./AuthActions";
+import AuthModal from "./AuthModal";
 import "./Login.css";
 
 const LoginComponent = props => {
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+
+  const toggleAuthModal = () => {
+    setAuthModalOpen(!isAuthModalOpen);
+  }
+
   const someoneSignedIn =
     typeof props.userToken !== "undefined" && props.userToken !== "";
 
   if (!someoneSignedIn) {
     return (
-      <Button variant="contained" color="link" onClick={props.actions.openLoginPage}>
-        Login with VUTTR&nbsp;
-        <MdPerson color="#007bff" />
-      </Button>
+      <>
+        <AuthModal isOpen={isAuthModalOpen} toggle={toggleAuthModal} />
+        <Button variant="contained" color="link" onClick={toggleAuthModal}>
+          Sign in&nbsp;
+          <MdPerson color="#007bff" />
+        </Button>
+      </>
     );
   } else {
     return (
