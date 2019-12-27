@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
@@ -47,7 +48,14 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 		configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
 		UrlBasedCorsConfigurationSource corsSource = new UrlBasedCorsConfigurationSource();
 		corsSource.registerCorsConfiguration("/**", configuration);
-		http.httpBasic().disable().anonymous().and().cors().configurationSource(corsSource).and().authorizeRequests()
-				.antMatchers("/user/**").authenticated().antMatchers("/public/**").permitAll();
+		http.
+				httpBasic().disable().anonymous()
+			.and()
+				.cors().configurationSource(corsSource)
+			.and()
+				.authorizeRequests().antMatchers("/user/**")
+					.authenticated().antMatchers("/public/**").permitAll()
+			.and()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
 	}
 }
