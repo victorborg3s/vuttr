@@ -20,7 +20,16 @@ const _openLoginPage = async () => {
     `redirect_uri=http://${window.location.host}${ERoute.OAUTH_CALLBACK}`,
     `scope=vuttr_tool_write`,
     `response_type=token`,
-    `client_id=vuttr-web`
+    `client_id=vuttr-web`,
+    /*
+      An opaque value used by the client to maintain
+      state between the request and callback. The authorization
+      server includes this value when redirecting the user-agent back
+      to the client. The parameter SHOULD be used for preventing
+      cross-site request forgery as described in Section 10.12 (RFC 6749).
+      It can be, e.g., session cookie, HTML5 local storage
+    */
+    `state=${document.cookie}`
   ].join("&");
 
   try {

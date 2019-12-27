@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { Button } from "reactstrap";
@@ -7,14 +7,12 @@ import * as AuthActions from "./AuthActions";
 import "./Login.css";
 
 const LoginComponent = props => {
-  const handleLogin = useCallback(props.actions.openLoginPage, []);
-  const handleLogout = useCallback(props.actions.signOut, []);
   const someoneSignedIn =
     typeof props.userToken !== "undefined" && props.userToken !== "";
 
   if (!someoneSignedIn) {
     return (
-      <Button variant="contained" color="link" onClick={handleLogin}>
+      <Button variant="contained" color="link" onClick={props.actions.openLoginPage}>
         Login with VUTTR&nbsp;
         <MdPerson color="#007bff" />
       </Button>
@@ -28,7 +26,7 @@ const LoginComponent = props => {
           size="sm"
           variant="contained"
           color="link"
-          onClick={handleLogout}
+          onClick={props.actions.signOut}
         >
           Sign Out
         </Button>

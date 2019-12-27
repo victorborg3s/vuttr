@@ -9,7 +9,7 @@
 		<version>2.2.1.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.bossabox.vuttr</groupId>
+	<groupId>com.github.victorborg3s.vuttr</groupId>
 	<artifactId>backend</artifactId>
 	<version>1.0-rc1</version>
 	<name>vuttr_backend</name>
